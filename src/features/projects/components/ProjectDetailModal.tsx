@@ -78,8 +78,9 @@ const SectionCard: React.FC<{
 );
 
 // Shared input / label classes for edit mode
+// bg-brand-input = var(--color-input-bg) = #ffffff, konsisten dengan design system
 const inputCls =
-  'w-full px-3 py-2.5 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-transparent transition-all';
+  'w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all';
 const labelCls = 'block text-[10px] font-bold uppercase tracking-wider text-brand-text-secondary mb-1.5';
 
 // ─── Main component ──────────────────────────────────────────────────────────
@@ -472,27 +473,27 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
 
             {/* Quick actions */}
             {!isEditing ? (
-              <div className="flex gap-2 flex-shrink-0">
+              <div className="flex gap-2 flex-shrink-0 mt-1 sm:mt-0">
                 <button
                   onClick={() => onEnterEditMode(selectedProject)}
-                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all active:scale-90"
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 text-white text-xs font-bold transition-all active:scale-90 min-h-[36px]"
                   title="Edit Acara"
                 >
-                  <PencilIcon className="w-4 h-4" />
+                  <PencilIcon className="w-4 h-4 flex-shrink-0" />
                   <span className="hidden sm:inline">Edit Acara</span>
                 </button>
                 <button
                   onClick={handleOpenBriefingModal}
-                  className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 flex items-center justify-center text-white transition-all active:scale-90"
+                  className="w-9 h-9 rounded-xl bg-white/15 hover:bg-white/25 border border-white/20 flex items-center justify-center text-white transition-all active:scale-90 flex-shrink-0"
                   title="Briefing Tim"
                 >
                   <Share2Icon className="w-4 h-4" />
                 </button>
               </div>
             ) : (
-              <div className="flex-shrink-0">
+              <div className="flex-shrink-0 mt-1 sm:mt-0">
                 <span className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-400/20 border border-amber-300/40 text-amber-200 text-xs font-bold">
-                  <PencilIcon className="w-3.5 h-3.5" />
+                  <PencilIcon className="w-3.5 h-3.5 flex-shrink-0" />
                   Mode Edit
                 </span>
               </div>
@@ -506,9 +507,9 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({
               { label: 'Terbayar',    value: formatCurrency(totalPaid) },
               { label: 'Sisa',        value: formatCurrency(selectedProject.totalCost - totalPaid) },
             ].map(item => (
-              <div key={item.label} className="flex flex-col items-center py-2.5 px-2 bg-white/5">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-purple-200/70">{item.label}</span>
-                <span className="text-sm font-black text-white mt-0.5 text-center leading-tight">{item.value}</span>
+              <div key={item.label} className="flex flex-col items-center py-2.5 px-1 sm:px-2 bg-white/5">
+                <span className="text-[9px] font-bold uppercase tracking-widest text-purple-200/70 text-center">{item.label}</span>
+                <span className="text-xs sm:text-sm font-black text-white mt-0.5 text-center leading-tight break-all">{item.value}</span>
               </div>
             ))}
           </div>
@@ -1054,167 +1055,181 @@ const EditModeContent: React.FC<EditModeContentProps> = ({
   onTeamSubJobChange, onReplaceTeamMember, onSave, onCancel,
 }) => {
   return (
-    <div className="animate-fade-in pb-24">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
+    <div className="animate-fade-in">
+      {/* Padding bawah agar konten tidak tertutup sticky action bar (~64px) */}
+      <div className="pb-20 space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
 
-        {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
-        <div className="space-y-4">
+          {/* ── LEFT COLUMN ─────────────────────────────────────────────── */}
+          <div className="space-y-4">
 
-          {/* 1 — Informasi Dasar */}
-          <SectionCard title="Informasi Dasar Acara">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="edit-projectName" className={labelCls}>Nama Acara Pernikahan <span className="text-red-400">*</span></label>
-                <input id="edit-projectName" type="text" name="projectName" value={editFormData.projectName} onChange={onFormChange} className={inputCls} placeholder="Contoh: Wedding Xander & Alya" required />
-              </div>
-              <div>
-                <label htmlFor="edit-projectType" className={labelCls}>Jenis Acara Pernikahan <span className="text-red-400">*</span></label>
-                <select id="edit-projectType" name="projectType" value={editFormData.projectType} onChange={onFormChange} className={inputCls} required>
-                  <option value="" disabled>Pilih Jenis...</option>
-                  {profile.projectTypes.map(pt => <option key={pt} value={pt}>{pt}</option>)}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="edit-location" className={labelCls}>Lokasi / Kota</label>
-                <input id="edit-location" type="text" name="location" value={editFormData.location} onChange={onFormChange} className={inputCls} placeholder="Contoh: Jakarta" />
-              </div>
-              <div>
-                <label htmlFor="edit-address" className={labelCls}>Alamat Lengkap / Gedung</label>
-                <textarea id="edit-address" name="address" value={editFormData.address} onChange={onFormChange} className={inputCls} placeholder="Contoh: Gedung Mulia, Jl. Gatot Subroto No. 1" rows={3} />
-              </div>
-            </div>
-          </SectionCard>
-
-          {/* 2 — Jadwal & Detail */}
-          <SectionCard title="Jadwal & Detail">
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="edit-date" className={labelCls}>Tanggal Acara <span className="text-red-400">*</span></label>
-                  <input id="edit-date" type="date" name="date" value={editFormData.date} onChange={onFormChange} className={inputCls} required />
-                </div>
-                <div>
-                  <label htmlFor="edit-deadlineDate" className={labelCls}>Deadline</label>
-                  <input id="edit-deadlineDate" type="date" name="deadlineDate" value={editFormData.deadlineDate} onChange={onFormChange} className={inputCls} />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="edit-startTime" className={labelCls}>Waktu Mulai</label>
-                  <input id="edit-startTime" type="time" name="startTime" value={editFormData.startTime} onChange={onFormChange} className={inputCls} />
-                </div>
-                <div>
-                  <label htmlFor="edit-endTime" className={labelCls}>Waktu Selesai</label>
-                  <input id="edit-endTime" type="time" name="endTime" value={editFormData.endTime} onChange={onFormChange} className={inputCls} />
-                </div>
-              </div>
-              {editFormData.status === 'Dikirim' && (
-                <div>
-                  <label htmlFor="edit-shippingDetails" className={labelCls}>Detail Pengiriman</label>
-                  <input id="edit-shippingDetails" type="text" name="shippingDetails" value={editFormData.shippingDetails} onChange={onFormChange} className={inputCls} placeholder="Informasi pengiriman hasil ke pengantin" />
-                </div>
-              )}
-            </div>
-          </SectionCard>
-
-          {/* 3 — Tautan & Catatan */}
-          <SectionCard title="Tautan & Catatan">
-            <div className="space-y-4">
-              <div>
-                <label htmlFor="edit-driveLink" className={labelCls}>Link Brief / Moodboard (Internal)</label>
-                <input id="edit-driveLink" type="url" name="driveLink" value={editFormData.driveLink} onChange={onFormChange} className={inputCls} placeholder="https://..." />
-              </div>
-              <div>
-                <label htmlFor="edit-clientDriveLink" className={labelCls}>Link File dari Pengantin</label>
-                <input id="edit-clientDriveLink" type="url" name="clientDriveLink" value={editFormData.clientDriveLink} onChange={onFormChange} className={inputCls} placeholder="https://drive.google.com/..." />
-              </div>
-              <div>
-                <label htmlFor="edit-finalDriveLink" className={labelCls}>Link File Jadi (untuk Pengantin)</label>
-                <input id="edit-finalDriveLink" type="url" name="finalDriveLink" value={editFormData.finalDriveLink} onChange={onFormChange} className={inputCls} placeholder="https://drive.google.com/..." />
-              </div>
-              <div>
-                <label htmlFor="edit-notes" className={labelCls}>Catatan Acara</label>
-                <textarea id="edit-notes" name="notes" value={editFormData.notes} onChange={onFormChange} className={inputCls} placeholder="Catatan penting terkait acara ini..." rows={4} />
-              </div>
-            </div>
-          </SectionCard>
-        </div>
-
-        {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
-        <div className="space-y-4">
-          {(['Tim', 'Vendor'] as const).map(category => (
-            <SectionCard key={category} title={category === 'Tim' ? 'Tim Internal' : 'Vendor / Mitra'}>
+            {/* 1 — Informasi Dasar */}
+            <SectionCard title="Informasi Dasar Acara">
               <div className="space-y-4">
-                {Object.entries(teamByCategory[category] || {}).length === 0 && (
-                  <p className="text-xs text-brand-text-secondary/60 italic text-center py-3">
-                    Belum ada {category === 'Tim' ? 'anggota tim' : 'vendor'} terdaftar.
-                  </p>
-                )}
-                {Object.entries(teamByCategory[category] || {}).map(([role, members]) => (
-                  <div key={role} className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[9px] font-bold text-brand-text-secondary uppercase tracking-widest">{role}</p>
-                      <div className="h-px flex-grow bg-brand-border/40" />
-                    </div>
-                    {(members as TeamMember[]).map(member => {
-                      const assignedMember = editFormData.team.find(t => t.memberId === member.id);
-                      const isSelected = !!assignedMember;
-                      const isPaid = paidMemberIds.has(member.id);
-                      return (
-                        <div key={member.id} className={`p-3 rounded-xl transition-all ${isSelected ? 'bg-blue-50/10 border-2 border-brand-accent' : 'bg-brand-bg border border-brand-border hover:border-brand-accent/30'}`}>
-                          <label className="flex items-center gap-3 cursor-pointer">
-                            <input type="checkbox" checked={isSelected} onChange={() => onTeamChange(member)} className="h-4 w-4 text-brand-accent rounded border-brand-border focus:ring-brand-accent/40" />
-                            <div className="flex-grow">
-                              <p className="text-sm font-semibold text-brand-text-light">{member.name}</p>
-                              {isSelected && <p className="text-[10px] text-brand-text-secondary mt-0.5">Fee standar: {formatCurrency(member.standardFee)}</p>}
-                            </div>
-                          </label>
-                          {isSelected && (
-                            <div className="mt-3 pt-3 border-t border-brand-border/40 space-y-3">
-                              <div>
-                                <label className={labelCls}>Biaya per Acara</label>
-                                <input type="number" value={assignedMember!.fee} onChange={e => onTeamFeeChange(member.id, Number(e.target.value))} disabled={isPaid} className={`${inputCls} text-right font-mono ${isPaid ? 'opacity-50 cursor-not-allowed' : ''}`} placeholder="0" />
-                                {isPaid && <p className="text-[10px] text-amber-600 mt-1">Sudah dibayar — tidak dapat diubah</p>}
-                              </div>
-                              <div>
-                                <label className={labelCls}>Keterangan Tugas</label>
-                                <input type="text" value={assignedMember!.subJob || ''} onChange={e => onTeamSubJobChange(member.id, e.target.value)} className={inputCls} placeholder="Contoh: Leader, Drone Operator..." />
-                              </div>
-                              <div>
-                                <label className={labelCls}>Ganti Personil / Freelance</label>
-                                <select value="" onChange={e => { const m = teamMembers.find(tm => tm.id === e.target.value); if (m) onReplaceTeamMember(member.id, m); }} className={`${inputCls} cursor-pointer`}>
-                                  <option value="">— Tetap {member.name} (atau pilih pengganti) —</option>
-                                  {teamMembers.filter(tm => tm.id !== member.id).map(tm => (
-                                    <option key={tm.id} value={tm.id}>Ganti ke: {tm.name} ({tm.role || 'Tim'})</option>
-                                  ))}
-                                </select>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
+                <div>
+                  <label htmlFor="edit-projectName" className={labelCls}>Nama Acara Pernikahan <span className="text-red-400">*</span></label>
+                  <input id="edit-projectName" type="text" name="projectName" value={editFormData.projectName} onChange={onFormChange} className={inputCls} placeholder="Contoh: Wedding Xander & Alya" required />
+                </div>
+                <div>
+                  <label htmlFor="edit-projectType" className={labelCls}>Jenis Acara Pernikahan <span className="text-red-400">*</span></label>
+                  <select id="edit-projectType" name="projectType" value={editFormData.projectType} onChange={onFormChange} className={inputCls} required>
+                    <option value="" disabled>Pilih Jenis...</option>
+                    {profile.projectTypes.map(pt => <option key={pt} value={pt}>{pt}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="edit-location" className={labelCls}>Lokasi / Kota</label>
+                  <input id="edit-location" type="text" name="location" value={editFormData.location} onChange={onFormChange} className={inputCls} placeholder="Contoh: Jakarta" />
+                </div>
+                <div>
+                  <label htmlFor="edit-address" className={labelCls}>Alamat Lengkap / Gedung</label>
+                  <textarea id="edit-address" name="address" value={editFormData.address} onChange={onFormChange} className={inputCls} placeholder="Contoh: Gedung Mulia, Jl. Gatot Subroto No. 1" rows={3} />
+                </div>
               </div>
             </SectionCard>
-          ))}
+
+            {/* 2 — Jadwal & Detail */}
+            <SectionCard title="Jadwal & Detail">
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="edit-date" className={labelCls}>Tanggal Acara <span className="text-red-400">*</span></label>
+                    <input id="edit-date" type="date" name="date" value={editFormData.date} onChange={onFormChange} className={inputCls} required />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-deadlineDate" className={labelCls}>Deadline</label>
+                    <input id="edit-deadlineDate" type="date" name="deadlineDate" value={editFormData.deadlineDate} onChange={onFormChange} className={inputCls} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="edit-startTime" className={labelCls}>Waktu Mulai</label>
+                    <input id="edit-startTime" type="time" name="startTime" value={editFormData.startTime} onChange={onFormChange} className={inputCls} />
+                  </div>
+                  <div>
+                    <label htmlFor="edit-endTime" className={labelCls}>Waktu Selesai</label>
+                    <input id="edit-endTime" type="time" name="endTime" value={editFormData.endTime} onChange={onFormChange} className={inputCls} />
+                  </div>
+                </div>
+                {editFormData.status === 'Dikirim' && (
+                  <div>
+                    <label htmlFor="edit-shippingDetails" className={labelCls}>Detail Pengiriman</label>
+                    <input id="edit-shippingDetails" type="text" name="shippingDetails" value={editFormData.shippingDetails} onChange={onFormChange} className={inputCls} placeholder="Informasi pengiriman hasil ke pengantin" />
+                  </div>
+                )}
+              </div>
+            </SectionCard>
+
+            {/* 3 — Tautan & Catatan */}
+            <SectionCard title="Tautan & Catatan">
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="edit-driveLink" className={labelCls}>Link Brief / Moodboard (Internal)</label>
+                  <input id="edit-driveLink" type="url" name="driveLink" value={editFormData.driveLink} onChange={onFormChange} className={inputCls} placeholder="https://..." />
+                </div>
+                <div>
+                  <label htmlFor="edit-clientDriveLink" className={labelCls}>Link File dari Pengantin</label>
+                  <input id="edit-clientDriveLink" type="url" name="clientDriveLink" value={editFormData.clientDriveLink} onChange={onFormChange} className={inputCls} placeholder="https://drive.google.com/..." />
+                </div>
+                <div>
+                  <label htmlFor="edit-finalDriveLink" className={labelCls}>Link File Jadi (untuk Pengantin)</label>
+                  <input id="edit-finalDriveLink" type="url" name="finalDriveLink" value={editFormData.finalDriveLink} onChange={onFormChange} className={inputCls} placeholder="https://drive.google.com/..." />
+                </div>
+                <div>
+                  <label htmlFor="edit-notes" className={labelCls}>Catatan Acara</label>
+                  <textarea id="edit-notes" name="notes" value={editFormData.notes} onChange={onFormChange} className={inputCls} placeholder="Catatan penting terkait acara ini..." rows={4} />
+                </div>
+              </div>
+            </SectionCard>
+          </div>
+
+          {/* ── RIGHT COLUMN ────────────────────────────────────────────── */}
+          <div className="space-y-4">
+            {(['Tim', 'Vendor'] as const).map(category => (
+              <SectionCard key={category} title={category === 'Tim' ? 'Tim Internal' : 'Vendor / Mitra'}>
+                <div className="space-y-4">
+                  {Object.entries(teamByCategory[category] || {}).length === 0 && (
+                    <p className="text-xs text-brand-text-secondary/60 italic text-center py-3">
+                      Belum ada {category === 'Tim' ? 'anggota tim' : 'vendor'} terdaftar.
+                    </p>
+                  )}
+                  {Object.entries(teamByCategory[category] || {}).map(([role, members]) => (
+                    <div key={role} className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <p className="text-[9px] font-bold text-brand-text-secondary uppercase tracking-widest">{role}</p>
+                        <div className="h-px flex-grow bg-brand-border/40" />
+                      </div>
+                      {(members as TeamMember[]).map(member => {
+                        const assignedMember = editFormData.team.find(t => t.memberId === member.id);
+                        const isSelected = !!assignedMember;
+                        const isPaid = paidMemberIds.has(member.id);
+                        return (
+                          <div key={member.id} className={`p-3 rounded-xl transition-all ${isSelected ? 'bg-blue-50 border-2 border-brand-accent' : 'bg-brand-bg border border-brand-border hover:border-brand-accent/30'}`}>
+                            <label className="flex items-center gap-3 cursor-pointer">
+                              <input type="checkbox" checked={isSelected} onChange={() => onTeamChange(member)} className="h-4 w-4 text-brand-accent rounded border-brand-border focus:ring-brand-accent/40 flex-shrink-0" />
+                              <div className="flex-grow min-w-0">
+                                <p className="text-sm font-semibold text-brand-text-light truncate">{member.name}</p>
+                                {isSelected && <p className="text-[10px] text-brand-text-secondary mt-0.5">Fee standar: {formatCurrency(member.standardFee)}</p>}
+                              </div>
+                            </label>
+                            {isSelected && (
+                              <div className="mt-3 pt-3 border-t border-brand-border/40 space-y-3">
+                                <div>
+                                  <label className={labelCls}>Biaya per Acara</label>
+                                  <input type="number" value={assignedMember!.fee} onChange={e => onTeamFeeChange(member.id, Number(e.target.value))} disabled={isPaid} className={`${inputCls} text-right font-mono ${isPaid ? 'opacity-50 cursor-not-allowed' : ''}`} placeholder="0" />
+                                  {isPaid && <p className="text-[10px] text-amber-600 mt-1">Sudah dibayar — tidak dapat diubah</p>}
+                                </div>
+                                <div>
+                                  <label className={labelCls}>Keterangan Tugas</label>
+                                  <input type="text" value={assignedMember!.subJob || ''} onChange={e => onTeamSubJobChange(member.id, e.target.value)} className={inputCls} placeholder="Contoh: Leader, Drone Operator..." />
+                                </div>
+                                <div>
+                                  <label className={labelCls}>Ganti Personil / Freelance</label>
+                                  <select value="" onChange={e => { const m = teamMembers.find(tm => tm.id === e.target.value); if (m) onReplaceTeamMember(member.id, m); }} className={`${inputCls} cursor-pointer`}>
+                                    <option value="">— Tetap {member.name} (atau pilih pengganti) —</option>
+                                    {teamMembers.filter(tm => tm.id !== member.id).map(tm => (
+                                      <option key={tm.id} value={tm.id}>Ganti ke: {tm.name} ({tm.role || 'Tim'})</option>
+                                    ))}
+                                  </select>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </SectionCard>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* ── Sticky Action Bar ─────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 flex justify-end items-center gap-3 px-4 py-3 bg-brand-surface/95 backdrop-blur-md border-t border-brand-border shadow-2xl">
-        <p className="flex-1 text-xs text-brand-text-secondary hidden sm:block">
-          <span className="font-bold text-amber-600">Mode Edit Aktif</span> — Perubahan belum disimpan ke database
+      {/* z-50: di atas konten modal (overflow-y scroll), di bawah overlay (z-60) */}
+      <div className="sticky bottom-0 left-0 right-0 z-50 flex items-center gap-3 px-4 py-3 bg-brand-surface/95 backdrop-blur-md border-t border-brand-border shadow-up-lg">
+        <p className="flex-1 text-xs text-brand-text-secondary hidden sm:block truncate">
+          <span className="font-bold text-amber-600">Mode Edit Aktif</span> — Perubahan belum disimpan
         </p>
-        <button type="button" onClick={onCancel} disabled={isSaving} className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-border bg-brand-bg text-brand-text-secondary text-sm font-semibold hover:text-brand-text-primary transition-all active:scale-95 disabled:opacity-50">
+        <button
+          type="button"
+          onClick={onCancel}
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-brand-border bg-brand-bg text-brand-text-secondary text-sm font-semibold hover:text-brand-text-primary transition-all active:scale-95 disabled:opacity-50 flex-shrink-0"
+        >
           <XIcon className="w-4 h-4" />
           Batal
         </button>
-        <button type="button" onClick={onSave} disabled={isSaving} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent text-white text-sm font-bold hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-brand-accent/25">
+        <button
+          type="button"
+          onClick={onSave}
+          disabled={isSaving}
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-brand-accent text-white text-sm font-bold hover:opacity-90 transition-all active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-brand-accent/25 flex-shrink-0"
+        >
           {isSaving ? (
             <>
-              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 animate-spin flex-shrink-0" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
               </svg>
@@ -1222,7 +1237,7 @@ const EditModeContent: React.FC<EditModeContentProps> = ({
             </>
           ) : (
             <>
-              <SaveIcon className="w-4 h-4" />
+              <SaveIcon className="w-4 h-4 flex-shrink-0" />
               Simpan Perubahan
             </>
           )}

@@ -86,22 +86,20 @@ thead th {
 
 /* Wrapper tabel agar bisa scroll horizontal di tablet */
 @media (max-width: 1279px) {
-  /* Semua tabel yang ditampilkan di tablet/mobile punya border jelas */
-  .overflow-x-auto table,
+  /* Semua tabel yang ditampilkan di tablet/mobile punya border jelas.
+     Jika tabel ada di dalam .overflow-x-auto, border ada di tabel itu sendiri
+     (wrapper .overflow-x-auto tidak boleh punya border agar tidak double) */
   table {
     border: 2px solid var(--color-border);
     border-collapse: collapse;
   }
 
-  .overflow-x-auto table th,
-  .overflow-x-auto table td,
   table th,
   table td {
     border: 2px solid var(--color-border) !important;
     padding: 0.625rem 0.75rem;
   }
 
-  .overflow-x-auto table thead th,
   table thead th {
     background-color: var(--color-input-bg);
     border-bottom: 2px solid var(--color-border);
@@ -109,15 +107,13 @@ thead th {
     white-space: nowrap;
   }
 
-  .overflow-x-auto table tbody tr:hover,
   table tbody tr:hover {
     background-color: var(--color-input-bg);
   }
 
   /* Stripe rows untuk keterbacaan di tablet */
-  .overflow-x-auto table tbody tr:nth-child(even),
   table tbody tr:nth-child(even) {
-    background-color: #e2e8f0; /* Solid slate-200 */
+    background-color: #e2e8f0;
   }
 }
 
@@ -1099,57 +1095,39 @@ body {
 
 /* ========================================
    TASK 2: MOBILE CARD CONSISTENCY
-   Semua kartu pengganti tabel di mobile
-   harus punya border tebal, shadow, dan
-   separator antar field yang jelas
+   Kartu pengganti tabel di mobile —
+   hanya kelas eksplisit .mobile-table-card
+   yang diupgrade, bukan semua div generik
    ======================================== */
 
 @media (max-width: 767px) {
-  /* ── Upgrade semua rounded-2xl card yang ada border-brand-border
-        agar tampak solid, bukan transparan ── */
-  .rounded-2xl.border,
-  .rounded-xl.border {
+  /* ── Hanya upgrade card yang benar-benar merupakan row data tabel ── */
+  .mobile-table-card {
     background-color: var(--color-surface) !important;
-    border-color: var(--color-border) !important;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.04) !important;
+    border: 1.5px solid var(--color-border) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.07) !important;
+    overflow: hidden !important;
   }
 
-  /* ── Setiap kartu row di dalam space-y container ── */
-  .space-y-3 > div,
-  .space-y-2 > div,
-  .space-y-4 > div {
-    border-width: 2px !important;
-    border-style: solid !important;
-    border-color: var(--color-border) !important;
-  }
-
-  /* ── Separator antar baris info di dalam kartu ── */
-  .space-y-3 > div > div + div,
-  .space-y-2 > div > div + div {
-    border-top: 2px solid var(--color-border);
-    padding-top: 0.5rem;
-    margin-top: 0.5rem;
-  }
-
-  /* ── Header section kartu (baris atas dengan status/nama) ── */
-  .rounded-2xl.border > div:first-child,
-  .rounded-xl.border > div:first-child {
-    border-bottom: 2px solid var(--color-border);
-  }
+  /* ── HAPUS: selector terlalu broad yang menambahkan border ke semua div ── 
+     space-y-3 > div, space-y-2 > div, space-y-4 > div sudah dihapus
+     karena menyebabkan double border pada SectionCard, form section, dsb.
+  ── */
 }
 
 /* ── Tablet (768px–1279px): tabel visible, perkuat border ── */
 @media (min-width: 768px) and (max-width: 1279px) {
-  /* Pastikan semua tabel di tablet punya outer border container */
+  /* Wrapper overflow-x-auto hanya sebagai clipping container, 
+     border ditangani oleh tabel itu sendiri agar tidak double */
   .overflow-x-auto {
-    border: 2px solid var(--color-border);
     border-radius: 0.75rem;
     overflow: hidden;
   }
 
-  /* Tabel di dalam overflow-x-auto tidak duplikat border */
-  .overflow-x-auto table {
-    border: none !important;
+  /* Border hanya pada tabel, bukan pada wrapper */
+  .overflow-x-auto > table {
+    border: 2px solid var(--color-border);
     border-radius: 0;
   }
 

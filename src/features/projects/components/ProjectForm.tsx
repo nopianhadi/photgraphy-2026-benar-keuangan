@@ -72,33 +72,35 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
             title={mode === 'add' ? 'Tambah Acara Pernikahan Baru (Operasional)' : `Edit Acara Pernikahan: ${formData.projectName}`}
             size="4xl"
         >
-            <form onSubmit={handleInternalSubmit} className="space-y-4 md:space-y-6 form-compact form-compact--ios-scale">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-4 md:gap-y-6 max-h-[70vh] overflow-y-auto pr-2 pb-4">
+            <form onSubmit={handleInternalSubmit} className="space-y-4 md:space-y-6">
+                {/* Hapus max-h + overflow-y-auto agar tidak ada nested scroll di mobile.
+                    Scroll ditangani oleh modal-content-area di Modal.tsx */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 md:gap-x-8 gap-y-4 md:gap-y-6">
                     {/* --- LEFT COLUMN --- */}
                     <div className="space-y-5 md:space-y-6">
                         {/* Section 1: Basic Info */}
-                        <section className="bg-brand-surface md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 border md:border-0 border-brand-border">
+                        <section className="bg-brand-surface rounded-2xl p-4 border border-brand-border">
                             <h4 className="text-sm md:text-base font-semibold text-gradient border-b border-brand-border pb-2 mb-4">Informasi Dasar Acara Pernikahan</h4>
                             <div className="space-y-5">
                                 {mode === 'add' && (
                                     <div className="space-y-2">
-                                        <label htmlFor="clientId" className="block text-xs text-brand-text-secondary">Pengantin</label>
-                                        <select id="clientId" name="clientId" value={formData.clientId} onChange={onClientChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" required>
-                                            <option value="" className="bg-brand-surface text-brand-text-primary">Pilih Pengantin...</option>
+                                        <label htmlFor="clientId" className="block text-xs font-semibold text-brand-text-secondary">Pengantin</label>
+                                        <select id="clientId" name="clientId" value={formData.clientId} onChange={onClientChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" required>
+                                            <option value="">Pilih Pengantin...</option>
                                             {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                         </select>
                                         <p className="text-xs text-brand-text-secondary">Pilih pengantin yang terkait dengan Acara Pernikahan ini</p>
                                     </div>
                                 )}
                                 <div className="space-y-2">
-                                    <label htmlFor="projectName" className="block text-xs text-brand-text-secondary">Nama Acara Pernikahan</label>
-                                    <input type="text" id="projectName" name="projectName" value={formData.projectName} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="Masukkan nama Acara Pernikahan" required />
+                                    <label htmlFor="projectName" className="block text-xs font-semibold text-brand-text-secondary">Nama Acara Pernikahan</label>
+                                    <input type="text" id="projectName" name="projectName" value={formData.projectName} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="Masukkan nama Acara Pernikahan" required />
                                     <p className="text-xs text-brand-text-secondary">Nama Acara Pernikahan (contoh: Wedding John & Jane)</p>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="projectType" className="block text-xs text-brand-text-secondary">Jenis Acara Pernikahan</label>
-                                        <select id="projectType" name="projectType" value={formData.projectType} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" required>
+                                        <label htmlFor="projectType" className="block text-xs font-semibold text-brand-text-secondary">Jenis Acara Pernikahan</label>
+                                        <select id="projectType" name="projectType" value={formData.projectType} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" required>
                                             <option value="" disabled>Pilih Jenis...</option>
                                             {profile.projectTypes.map(pt => <option key={pt} value={pt}>{pt}</option>)}
                                         </select>
@@ -106,8 +108,8 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                     </div>
                                     {mode === 'add' && (
                                         <div className="space-y-2">
-                                            <label htmlFor="status" className="block text-xs text-brand-text-secondary">Progres Acara Pernikahan Pengantin</label>
-                                            <select id="status" name="status" value={formData.status} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" required>
+                                            <label htmlFor="status" className="block text-xs font-semibold text-brand-text-secondary">Progres Acara Pernikahan Pengantin</label>
+                                            <select id="status" name="status" value={formData.status} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" required>
                                                 {profile.projectStatusConfig.map(s => <option key={s.id} value={s.name}>{s.name}</option>)}
                                             </select>
                                             <p className="text-xs text-brand-text-secondary">Status progres Acara Pernikahan saat ini</p>
@@ -116,13 +118,13 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                 </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="location" className="block text-xs text-brand-text-secondary">Lokasi (Kota)</label>
-                                        <input type="text" id="location" name="location" value={formData.location} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="Kota Contoh: Jakarta" />
+                                        <label htmlFor="location" className="block text-xs font-semibold text-brand-text-secondary">Lokasi (Kota)</label>
+                                        <input type="text" id="location" name="location" value={formData.location} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="Kota Contoh: Jakarta" />
                                         <p className="text-xs text-brand-text-secondary">Kota tempat Acara Pernikahan berlangsung</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="address" className="block text-xs text-brand-text-secondary">Alamat Lengkap / Gedung</label>
-                                        <textarea id="address" name="address" value={formData.address} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="Contoh: Gedung Mulia, Jl. Gatot Subroto No. 1" rows={3}></textarea>
+                                        <label htmlFor="address" className="block text-xs font-semibold text-brand-text-secondary">Alamat Lengkap / Gedung</label>
+                                        <textarea id="address" name="address" value={formData.address} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="Contoh: Gedung Mulia, Jl. Gatot Subroto No. 1" rows={3}></textarea>
                                         <p className="text-xs text-brand-text-secondary">Alamat spesifik venue Acara Pernikahan</p>
                                     </div>
                                 </div>
@@ -130,37 +132,37 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                         </section>
 
                         {/* Section 2: Schedule & Details */}
-                        <section className="bg-brand-surface md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 border md:border-0 border-brand-border">
+                        <section className="bg-brand-surface rounded-2xl p-4 border border-brand-border">
                             <h4 className="text-sm md:text-base font-semibold text-gradient border-b border-brand-border pb-2 mb-4">Jadwal & Detail</h4>
                             <div className="space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="date" className="block text-xs text-brand-text-secondary">Tanggal Acara Pernikahan</label>
-                                        <input type="date" id="date" name="date" value={formData.date || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" required />
+                                        <label htmlFor="date" className="block text-xs font-semibold text-brand-text-secondary">Tanggal Acara Pernikahan</label>
+                                        <input type="date" id="date" name="date" value={formData.date || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" required />
                                         <p className="text-xs text-brand-text-secondary">Tanggal pelaksanaan Acara Pernikahan</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="deadlineDate" className="block text-xs text-brand-text-secondary">Deadline</label>
-                                        <input type="date" id="deadlineDate" name="deadlineDate" value={formData.deadlineDate || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" />
+                                        <label htmlFor="deadlineDate" className="block text-xs font-semibold text-brand-text-secondary">Deadline</label>
+                                        <input type="date" id="deadlineDate" name="deadlineDate" value={formData.deadlineDate || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" />
                                         <p className="text-xs text-brand-text-secondary">Batas waktu penyerahan hasil</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="startTime" className="block text-xs text-brand-text-secondary">Waktu Mulai</label>
-                                        <input type="time" id="startTime" name="startTime" value={formData.startTime || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" />
+                                        <label htmlFor="startTime" className="block text-xs font-semibold text-brand-text-secondary">Waktu Mulai</label>
+                                        <input type="time" id="startTime" name="startTime" value={formData.startTime || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" />
                                         <p className="text-xs text-brand-text-secondary">Jam mulai Acara Pernikahan</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="endTime" className="block text-xs text-brand-text-secondary">Waktu Selesai</label>
-                                        <input type="time" id="endTime" name="endTime" value={formData.endTime || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" />
+                                        <label htmlFor="endTime" className="block text-xs font-semibold text-brand-text-secondary">Waktu Selesai</label>
+                                        <input type="time" id="endTime" name="endTime" value={formData.endTime || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" />
                                         <p className="text-xs text-brand-text-secondary">Jam selesai Acara Pernikahan</p>
                                     </div>
                                 </div>
                                 {formData.status === 'Dikirim' && (
                                     <div className="space-y-2">
-                                        <label htmlFor="shippingDetails" className="block text-xs text-brand-text-secondary">Detail Pengiriman</label>
-                                        <input type="text" id="shippingDetails" name="shippingDetails" value={formData.shippingDetails} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="Masukkan detail pengiriman" />
+                                        <label htmlFor="shippingDetails" className="block text-xs font-semibold text-brand-text-secondary">Detail Pengiriman</label>
+                                        <input type="text" id="shippingDetails" name="shippingDetails" value={formData.shippingDetails} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="Masukkan detail pengiriman" />
                                         <p className="text-xs text-brand-text-secondary">Informasi pengiriman hasil ke pengantin</p>
                                     </div>
                                 )}
@@ -176,23 +178,23 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                         >
                             <div className="space-y-5">
                                 <div className="space-y-2">
-                                    <label htmlFor="driveLink" className="block text-xs text-brand-text-secondary">Link Brief/Moodboard (Internal)</label>
-                                    <input type="url" id="driveLink" name="driveLink" value={formData.driveLink} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="https://..." />
+                                    <label htmlFor="driveLink" className="block text-xs font-semibold text-brand-text-secondary">Link Brief/Moodboard (Internal)</label>
+                                    <input type="url" id="driveLink" name="driveLink" value={formData.driveLink} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="https://..." />
                                     <p className="text-xs text-brand-text-secondary">Link ke folder brief atau moodboard untuk tim internal</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="clientDriveLink" className="block text-xs text-brand-text-secondary">Link File dari Pengantin</label>
-                                    <input type="url" id="clientDriveLink" name="clientDriveLink" value={formData.clientDriveLink || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="https://drive.google.com/..." />
+                                    <label htmlFor="clientDriveLink" className="block text-xs font-semibold text-brand-text-secondary">Link File dari Pengantin</label>
+                                    <input type="url" id="clientDriveLink" name="clientDriveLink" value={formData.clientDriveLink || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="https://drive.google.com/..." />
                                     <p className="text-xs text-brand-text-secondary">Link file atau referensi yang diberikan pengantin</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="finalDriveLink" className="block text-xs text-brand-text-secondary">Link File Jadi (untuk Pengantin)</label>
-                                    <input type="url" id="finalDriveLink" name="finalDriveLink" value={formData.finalDriveLink || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all" placeholder="https://drive.google.com/..." />
+                                    <label htmlFor="finalDriveLink" className="block text-xs font-semibold text-brand-text-secondary">Link File Jadi (untuk Pengantin)</label>
+                                    <input type="url" id="finalDriveLink" name="finalDriveLink" value={formData.finalDriveLink || ''} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all" placeholder="https://drive.google.com/..." />
                                     <p className="text-xs text-brand-text-secondary">Link hasil akhir yang akan dibagikan ke pengantin</p>
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="notes" className="block text-xs text-brand-text-secondary">Catatan Tambahan</label>
-                                    <textarea id="notes" name="notes" value={formData.notes} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all resize-none" placeholder="Catatan tambahan untuk Acara Pernikahan ini..." rows={4}></textarea>
+                                    <label htmlFor="notes" className="block text-xs font-semibold text-brand-text-secondary">Catatan Tambahan</label>
+                                    <textarea id="notes" name="notes" value={formData.notes} onChange={onFormChange} className="w-full px-4 py-3 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all resize-none" placeholder="Catatan tambahan untuk Acara Pernikahan ini..." rows={4}></textarea>
                                     <p className="text-xs text-brand-text-secondary">Catatan penting terkait Acara Pernikahan ini</p>
                                 </div>
                             </div>
@@ -202,14 +204,14 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                     {/* --- RIGHT COLUMN --- */}
                     <div className="space-y-5 md:space-y-6">
                         {/* Section 4: Team Assignment */}
-                        <section className="bg-brand-surface md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 border md:border-0 border-brand-border">
+                        <section className="bg-brand-surface rounded-2xl p-4 border border-brand-border">
                             <h4 className="text-sm md:text-base font-semibold text-gradient border-b border-brand-border pb-2 mb-4">Tugas Tim</h4>
                             <div className="space-y-6">
                                 {(['Tim', 'Vendor'] as const).map(category => (
                                     <div key={category} className="space-y-4">
-                                        <h5 className={`text-sm font-bold uppercase tracking-widest pb-2 border-b-2 flex items-center gap-2 ${category === 'Tim' ? 'text-blue-800 border-blue-800/20' : 'text-purple-400 border-purple-400/20'}`}>
-                                            <div className={`w-2 h-2 rounded-full ${category === 'Tim' ? 'bg-blue-800' : 'bg-purple-400'}`}></div>
-                                            {category === 'Tim' ? 'Pilih Tim Internal' : 'Pilih Vendor / Tim / Vendor'}
+                                        <h5 className={`text-sm font-bold uppercase tracking-widest pb-2 border-b-2 flex items-center gap-2 ${category === 'Tim' ? 'text-blue-700 border-blue-700/20' : 'text-purple-600 border-purple-600/20'}`}>
+                                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${category === 'Tim' ? 'bg-blue-700' : 'bg-purple-600'}`}></div>
+                                            {category === 'Tim' ? 'Tim Internal' : 'Vendor / Mitra'}
                                         </h5>
 
                                         <div className="space-y-4">
@@ -223,12 +225,12 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                         const assignedMember = formData.team.find((t: any) => t.memberId === member.id);
                                                         const isSelected = !!assignedMember;
                                                         return (
-                                                            <div key={member.id} className={`p-4 rounded-xl transition-all ${isSelected ? 'bg-blue-50/10 border-2 border-blue-800' : 'bg-brand-bg border border-brand-border hover:border-brand-accent/30'}`}>
-                                                                <div className="flex justify-between items-center">
-                                                                    <label className="flex items-center gap-3 cursor-pointer flex-grow">
-                                                                        <input type="checkbox" checked={isSelected} onChange={() => onTeamChange(member)} className="h-5 w-5 text-blue-800 rounded-lg border-brand-border bg-white/5 focus:ring-blue-600" />
-                                                                        <div>
-                                                                            <p className="font-semibold text-brand-text-light">{member.name}</p>
+                                                            <div key={member.id} className={`p-4 rounded-xl transition-all ${isSelected ? 'bg-blue-50 border-2 border-brand-accent' : 'bg-brand-bg border border-brand-border hover:border-brand-accent/30'}`}>
+                                                                <div className="flex items-start gap-3">
+                                                                    <label className="flex items-center gap-3 cursor-pointer flex-grow min-w-0">
+                                                                        <input type="checkbox" checked={isSelected} onChange={() => onTeamChange(member)} className="h-5 w-5 text-brand-accent rounded-lg border-brand-border bg-brand-input focus:ring-brand-accent/40 flex-shrink-0" />
+                                                                        <div className="min-w-0">
+                                                                            <p className="font-semibold text-brand-text-light truncate">{member.name}</p>
                                                                             {isSelected && <p className="text-[10px] text-brand-text-secondary mt-0.5">Pembayaran Standar: {formatCurrency(member.standardFee)}</p>}
                                                                         </div>
                                                                     </label>
@@ -242,23 +244,23 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                                                 value={assignedMember.fee}
                                                                                 onChange={e => onTeamFeeChange(member.id, Number(e.target.value))}
                                                                                 disabled={paidMemberIdsForThisProject.has(member.id)}
-                                                                                className="w-full px-3 py-2 rounded-lg border border-brand-border bg-white/5 text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all text-right font-mono"
+                                                                                className="w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all text-right font-mono disabled:opacity-50 disabled:cursor-not-allowed"
                                                                                 placeholder="0"
                                                                             />
                                                                         </div>
                                                                         <div className="sm:col-span-2 space-y-1.5">
-                                                                            <label className="block text-[10px] uppercase font-bold text-brand-text-secondary">Keterangan Tugas Spesifik untuk Tim</label>
+                                                                            <label className="block text-[10px] uppercase font-bold text-brand-text-secondary">Keterangan Tugas Spesifik</label>
                                                                             <input
                                                                                 type="text"
                                                                                 value={assignedMember.subJob || ''}
                                                                                 onChange={e => onTeamSubJobChange(member.id, e.target.value)}
-                                                                                className="w-full px-3 py-2 rounded-lg border border-brand-border bg-white/5 text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                                                                                className="w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary text-sm focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all"
                                                                                 placeholder="Tugas spesifik (misal: Leader, Drone Operator, dll)"
                                                                             />
                                                                         </div>
                                                                         {onReplaceTeamMember && (
                                                                             <div className="sm:col-span-2 space-y-1.5">
-                                                                                <label className="block text-[10px] uppercase font-bold text-blue-800">Ganti Personil / Freelance (Ganti Slot Record)</label>
+                                                                                <label className="block text-[10px] uppercase font-bold text-brand-text-secondary">Ganti Personil / Freelance</label>
                                                                                 <select
                                                                                     value=""
                                                                                     onChange={e => {
@@ -267,7 +269,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                                                             onReplaceTeamMember(member.id, newMember);
                                                                                         }
                                                                                     }}
-                                                                                    className="w-full px-3 py-2 rounded-lg border border-brand-border bg-white/5 text-brand-text-primary text-xs focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all cursor-pointer"
+                                                                                    className="w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary text-xs focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all cursor-pointer"
                                                                                 >
                                                                                     <option value="">-- Tetap {member.name} (atau pilih personil pengganti) --</option>
                                                                                     {(teamMembers || [])
@@ -311,24 +313,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                         </CollapsibleSection>
 
                         {mode === 'add' && (
-                            <section className="bg-brand-surface md:bg-transparent rounded-2xl md:rounded-none p-4 md:p-0 border md:border-0 border-brand-border">
+                            <section className="bg-brand-surface rounded-2xl p-4 border border-brand-border">
                                 <h4 className="text-sm md:text-base font-semibold text-gradient border-b border-brand-border pb-2 mb-4">Sub-Status untuk "{formData.status}"</h4>
                                 <div className="p-4 bg-brand-bg rounded-xl">
-                                    <label className="block text-xs font-semibold text-blue-800 mb-2">Pilih sub-status aktif:</label>
+                                    <label className="block text-xs font-semibold text-brand-text-secondary mb-2">Pilih sub-status aktif:</label>
                                     <p className="text-xs text-brand-text-secondary mb-3">Centang sub-status yang sedang aktif untuk Acara Pernikahan ini</p>
                                     <div className="space-y-2 mb-4 max-h-40 overflow-y-auto">
                                         {(formData.customSubStatuses || []).map((sub: SubStatusConfig) => (
                                             <label key={sub.name} className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-all ${(formData.activeSubStatuses || []).includes(sub.name)
-                                                ? 'bg-blue-50/10 border-2 border-blue-800'
-                                                : 'bg-brand-input border border-brand-border hover:border-blue-300'
+                                                ? 'bg-blue-50 border-2 border-brand-accent'
+                                                : 'bg-brand-input border border-brand-border hover:border-brand-accent/30'
                                                 }`}>
                                                 <input
                                                     type="checkbox"
                                                     checked={(formData.activeSubStatuses || []).includes(sub.name)}
                                                     onChange={e => onSubStatusChange(sub.name, e.target.checked)}
-                                                    className="h-4 w-4 text-blue-800 rounded focus:ring-blue-600 flex-shrink-0"
+                                                    className="h-4 w-4 text-brand-accent rounded focus:ring-brand-accent/40 flex-shrink-0"
                                                 />
-                                                <span className="font-medium">{sub.name}</span>
+                                                <span className="font-medium text-sm text-brand-text-primary">{sub.name}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -339,24 +341,24 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                         {(formData.customSubStatuses || []).map((sub: SubStatusConfig, index: number) => (
                                             <div key={index} className="p-4 bg-brand-surface rounded-xl border border-brand-border space-y-4">
                                                 <div className="space-y-2">
-                                                    <label className="block text-xs text-brand-text-secondary">Nama Sub-Status</label>
+                                                    <label className="block text-xs font-semibold text-brand-text-secondary">Nama Sub-Status</label>
                                                     <input
                                                         type="text"
                                                         value={sub.name || ''}
                                                         onChange={e => onCustomSubStatusChange(index, 'name', e.target.value)}
                                                         placeholder="Masukkan nama sub-status"
-                                                        className="w-full px-3 py-2 rounded-lg border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                                        className="w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all"
                                                     />
                                                     <p className="text-xs text-brand-text-secondary">Nama tahapan atau status (contoh: Persiapan Materi / Produksi)</p>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-xs text-brand-text-secondary">Catatan (Opsional)</label>
+                                                    <label className="block text-xs font-semibold text-brand-text-secondary">Catatan (Opsional)</label>
                                                     <input
                                                         type="text"
                                                         value={sub.note || ''}
                                                         onChange={e => onCustomSubStatusChange(index, 'note', e.target.value)}
                                                         placeholder="Catatan tambahan"
-                                                        className="w-full px-3 py-2 rounded-lg border border-brand-border bg-white/5 text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                                        className="w-full px-3 py-2.5 rounded-xl border border-brand-border bg-brand-input text-brand-text-primary focus:outline-none focus:ring-2 focus:ring-brand-accent/50 focus:border-brand-accent transition-all"
                                                     />
                                                     <p className="text-xs text-brand-text-secondary">Keterangan atau detail tambahan</p>
                                                 </div>
@@ -364,9 +366,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                                     <button
                                                         type="button"
                                                         onClick={() => onRemoveCustomSubStatus(index)}
-                                                        className="flex items-center gap-2 px-3 py-2 text-sm text-brand-danger hover:bg-brand-danger/10 rounded-lg transition-colors"
+                                                        className="inline-flex items-center gap-2 px-3 py-2 text-sm text-brand-danger hover:bg-red-50 rounded-lg transition-colors"
                                                     >
-                                                        <Trash2Icon className="w-4 h-4" />
+                                                        <Trash2Icon className="w-4 h-4 flex-shrink-0" />
                                                         Hapus
                                                     </button>
                                                 </div>
@@ -376,7 +378,7 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                                     <button
                                         type="button"
                                         onClick={onAddCustomSubStatus}
-                                        className="mt-3 px-4 py-2 text-sm font-semibold text-blue-800 hover:bg-blue-50/10 rounded-lg transition-colors"
+                                        className="mt-3 px-4 py-2 text-sm font-semibold text-brand-accent hover:bg-brand-accent/10 rounded-lg transition-colors"
                                     >
                                         + Tambah Sub-Status Baru
                                     </button>
@@ -386,9 +388,9 @@ export const ProjectForm: React.FC<ProjectFormProps> = ({
                     </div>
                 </div>
 
-                <div className="flex flex-col md:flex-row justify-end items-stretch md:items-center gap-3 pt-6 border-t border-brand-border">
-                    <button type="button" onClick={onClose} className="button-secondary w-full md:w-auto order-2 md:order-1">Batal</button>
-                    <button type="submit" disabled={isSubmitting} className="button-primary w-full md:w-auto order-1 md:order-2 active:scale-95 transition-transform">{isSubmitting ? 'Menyimpan...' : (mode === 'add' ? 'Simpan Acara Pernikahan' : 'Update Acara Pernikahan')}</button>
+                <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-3 pt-6 border-t border-brand-border">
+                    <button type="button" onClick={onClose} className="button-secondary w-full sm:w-auto order-2 sm:order-1">Batal</button>
+                    <button type="submit" disabled={isSubmitting} className="button-primary w-full sm:w-auto order-1 sm:order-2 active:scale-95 transition-transform disabled:opacity-60 disabled:cursor-not-allowed">{isSubmitting ? 'Menyimpan...' : (mode === 'add' ? 'Simpan Acara Pernikahan' : 'Update Acara Pernikahan')}</button>
                 </div>
             </form>
         </Modal>

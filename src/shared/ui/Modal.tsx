@@ -51,13 +51,10 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
 
   return createPortal(
     <div
-      className="app-modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center p-4 sm:p-6 md:p-8 transition-all duration-300 xl:items-start xl:pt-8"
+      className="app-modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-[60] flex justify-center items-center transition-all duration-300 xl:items-start"
       style={{
         zIndex: isOpen ? 60 : -1,
-        paddingTop: 'calc(1rem + var(--safe-area-inset-top, 0px))',
-        paddingBottom: 'calc(1rem + var(--safe-area-inset-bottom, 0px))',
-        paddingLeft: 'calc(1rem + var(--safe-area-inset-left, 0px))',
-        paddingRight: 'calc(1rem + var(--safe-area-inset-right, 0px))',
+        padding: 'calc(1rem + var(--safe-area-inset-top, 0px)) calc(1rem + var(--safe-area-inset-right, 0px)) calc(1rem + var(--safe-area-inset-bottom, 0px)) calc(1rem + var(--safe-area-inset-left, 0px))',
       }}
       onClick={onClose}
       role="dialog"
@@ -70,16 +67,15 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
           rounded-2xl sm:rounded-3xl 
           shadow-2xl 
           ${sizeClasses[size]} 
-          max-h-[calc(100vh-2rem-var(--safe-area-inset-bottom,0px))] 
-          sm:max-h-[calc(100vh-4rem-var(--safe-area-inset-bottom,0px))] 
-          md:max-h-[calc(100vh-6rem-var(--safe-area-inset-bottom,0px))]
-          xl:max-h-[calc(100vh-2rem)]
           flex flex-col 
           transform transition-all duration-300 
           animate-scale-in 
           border border-brand-border/50
           backdrop-blur-xl
         `}
+        style={{
+          maxHeight: 'calc(100dvh - 2rem - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px))',
+        }}
         onClick={e => e.stopPropagation()}
       >
         {/* Enhanced Header with better mobile spacing */}
@@ -180,57 +176,59 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
           animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         
-        /* Enhanced mobile modal styles */
-        @media (max-width: 640px) {
-          .modal-content-area {
-            /* Better mobile scrolling + padding so bottom buttons are tappable */
-            -webkit-overflow-scrolling: touch;
-            overscroll-behavior: contain;
-            padding-bottom: calc(1.5rem + var(--safe-area-inset-bottom, 0px)) !important;
+        /* ── xl: posisikan dari atas ── */
+        @media (min-width: 1280px) {
+          .app-modal-overlay {
+            align-items: flex-start;
+            padding-top: 2rem;
+          }
+          .app-modal-dialog {
+            max-height: calc(100vh - 4rem);
+          }
+        }
+
+        /* ── Mobile (< 640px): aman terhadap viewport, tanpa padding bottom-nav berlebih ── */
+        @media (max-width: 639px) {
+          .app-modal-overlay {
+            align-items: flex-start;
+            padding: 0.75rem !important;
+            padding-top: calc(0.75rem + var(--safe-area-inset-top, 0px)) !important;
+            padding-bottom: calc(0.75rem + var(--safe-area-inset-bottom, 0px)) !important;
           }
 
-          .modal-content-area .button-primary,
-          .modal-content-area .button-secondary,
-          .modal-content-area button[type="submit"],
-          .modal-content-area button[type="button"] {
-            min-height: 48px !important;
+          .app-modal-dialog {
+            max-height: calc(100dvh - 1.5rem - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px)) !important;
+            width: 100% !important;
+          }
+
+          .modal-content-area {
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
+            padding-bottom: 1rem !important;
           }
 
           .app-modal-footer {
-            padding-bottom: calc(1rem + var(--safe-area-inset-bottom, 0px)) !important;
+            padding-bottom: calc(0.75rem + var(--safe-area-inset-bottom, 0px)) !important;
           }
 
+          .modal-content-area button[type="submit"],
           .app-modal-footer .button-primary,
           .app-modal-footer .button-secondary,
           .app-modal-footer button {
-            min-height: 48px !important;
-            min-width: 44px !important;
-          }
-
-          /* Account for bottom navigation bar on mobile */
-          .app-modal-overlay {
-            /* Ensure modal doesn't get covered by bottom nav */
-            padding-bottom: calc(5rem + var(--safe-area-inset-bottom, 0px)) !important;
-            align-items: flex-start !important;
-            padding-top: 1rem !important;
-          }
-
-          .app-modal-dialog {
-            /* Adjust max height to account for bottom nav and ensure scrollability */
-            max-height: calc(100vh - 6rem - var(--safe-area-inset-bottom, 0px)) !important;
-            margin-top: 0 !important;
-            margin-bottom: auto !important;
+            min-height: 44px !important;
           }
         }
-        
-        /* Extra small screens */
-        @media (max-width: 380px) {
+
+        /* ── Extra small (< 380px) ── */
+        @media (max-width: 379px) {
           .app-modal-overlay {
-            padding-bottom: calc(7rem + var(--safe-area-inset-bottom, 0px)) !important;
+            padding: 0.5rem !important;
+            padding-top: calc(0.5rem + var(--safe-area-inset-top, 0px)) !important;
+            padding-bottom: calc(0.5rem + var(--safe-area-inset-bottom, 0px)) !important;
           }
-          
+
           .app-modal-dialog {
-            max-height: calc(100vh - 11rem - var(--safe-area-inset-bottom, 0px)) !important;
+            max-height: calc(100dvh - 1rem - var(--safe-area-inset-top, 0px) - var(--safe-area-inset-bottom, 0px)) !important;
           }
         }
         
