@@ -28,6 +28,7 @@ import ProjectStatModals from '../../features/projects/components/ProjectStatMod
 import { useProjectFilters } from '../../features/projects/hooks/useProjectFilters';
 import { useProjectBriefing } from '../../features/projects/hooks/useProjectBriefing';
 import { useProjectForm } from '../../features/projects/hooks/useProjectForm';
+import { useProjectEditMode } from '../../features/projects/hooks/useProjectEditMode';
 import { useProjectOperations } from '../../features/projects/hooks/useProjectOperations';
 import { calculateProjectsModalStats } from '../../features/projects/utils/projectCalculations';
 import { getProjectWithRelations } from '../../services/projects';
@@ -191,6 +192,35 @@ export const Projects: React.FC<ProjectsProps> = ({
         setPockets,
         profile,
         showNotification
+    });
+
+    // ── Edit mode (inline on detail modal) ──────────────────────────────────
+    const {
+        isEditing: isEditingProject,
+        isSaving: isSavingProject,
+        editFormData,
+        teamByCategory: editTeamByCategory,
+        enterEditMode,
+        cancelEditMode,
+        handleEditFormChange,
+        handleEditTeamChange,
+        handleEditTeamFeeChange,
+        handleEditTeamSubJobChange,
+        handleEditReplaceTeamMember,
+        handleSaveEdit,
+    } = useProjectEditMode({
+        projects,
+        setProjects,
+        teamMembers,
+        teamProjectPayments,
+        setTeamProjectPayments,
+        transactions,
+        setTransactions,
+        cards,
+        setCards,
+        profile,
+        showNotification,
+        setSelectedProject,
     });
 
     // Modal Stats Calculation
@@ -465,6 +495,18 @@ export const Projects: React.FC<ProjectsProps> = ({
                     teamProjectPayments={teamProjectPayments}
                     cards={cards}
                     onOpenSharePreview={(data) => setSharePreview({ title: data.title, message: data.message, phone: data.phone })}
+                    isEditing={isEditingProject}
+                    isSaving={isSavingProject}
+                    editFormData={editFormData}
+                    editTeamByCategory={editTeamByCategory}
+                    onEnterEditMode={enterEditMode}
+                    onCancelEditMode={cancelEditMode}
+                    onEditFormChange={handleEditFormChange}
+                    onEditTeamChange={handleEditTeamChange}
+                    onEditTeamFeeChange={handleEditTeamFeeChange}
+                    onEditTeamSubJobChange={handleEditTeamSubJobChange}
+                    onEditReplaceTeamMember={handleEditReplaceTeamMember}
+                    onSaveEdit={handleSaveEdit}
                 />
             </Modal>
 
