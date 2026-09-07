@@ -1,0 +1,8 @@
+{
+  "name": "keuangan 2026",
+  "description": "Imported from GitHub: haddigifar-tech/kuangan",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

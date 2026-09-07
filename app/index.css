@@ -1,0 +1,2131 @@
+/* Text gradient override for black text */
+.text-gradient {
+  color: #000000;
+  background: none;
+  background-clip: initial;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+}
+
+/* iOS/iPad: visually scale inputs smaller without reducing font-size (avoid auto-zoom) */
+@media (max-width: 1024px) {
+
+  .ios .form-compact.form-compact--ios-scale input.input-field,
+  .ios .form-compact.form-compact--ios-scale select.input-field,
+  .ios .form-compact.form-compact--ios-scale textarea.input-field,
+  .ios .form-compact.form-compact--ios-scale .input-with-icon input,
+  .ios .form-compact.form-compact--ios-scale input[type="date"].input-field {
+    transform: scale(0.9);
+    transform-origin: top left;
+    will-change: transform;
+  }
+
+  /* Compact variant: shrink text and numbers for the Tim / Vendor payment slip */
+  .print-slip-compact {
+    font-size: 0.9rem;
+    /* ~14.4px base */
+  }
+
+  .print-slip-compact h1 {
+    font-size: 1.5rem;
+  }
+
+  .print-slip-compact h2 {
+    font-size: 1.1rem;
+  }
+
+  .print-slip-compact h3 {
+    font-size: 1rem;
+  }
+
+  .print-slip-compact p,
+  .print-slip-compact span,
+  .print-slip-compact li {
+    font-size: 0.9rem;
+    line-height: 1.35;
+  }
+
+  .print-slip-compact table {
+    font-size: 0.85rem;
+  }
+
+  .print-slip-compact th,
+  .print-slip-compact td {
+    padding: 6px 8px;
+  }
+
+  .print-slip-compact .invoice-totals .font-bold {
+    font-size: 1rem;
+  }
+
+  .print-slip-compact .text-right,
+  .print-slip-compact .tabular-nums,
+  .print-slip-compact .amount {
+    font-size: 0.95rem;
+  }
+
+  @media (max-width: 640px) {
+    .print-slip-compact {
+      font-size: 0.85rem;
+    }
+
+    .print-slip-compact table {
+      font-size: 0.8rem;
+    }
+  }
+
+
+  /* keep container spacing tight so scaled controls don't look spaced out */
+  .ios .form-compact.form-compact--ios-scale .input-group,
+  .ios .form-compact.form-compact--ios-scale .form-group {
+    margin-bottom: 8px !important;
+  }
+
+  /* shrink dropdown arrow visually */
+  .ios .form-compact.form-compact--ios-scale select.input-field {
+    background-size: 1em 1em !important;
+    background-position: right 0.6rem center !important;
+  }
+}
+
+/* Force the tiniest text on mobile (will cause iOS zoom on focus) */
+@media (max-width: 768px) {
+
+  .form-compact.form-compact--force-tiny input.input-field,
+  .form-compact.form-compact--force-tiny select.input-field,
+  .form-compact.form-compact--force-tiny textarea.input-field,
+  .form-compact.form-compact--force-tiny .input-with-icon input,
+  .form-compact.form-compact--force-tiny input[type="date"].input-field {
+    font-size: 13px !important;
+  }
+
+  .form-compact.form-compact--force-tiny input.input-field::placeholder,
+  .form-compact.form-compact--force-tiny textarea.input-field::placeholder {
+    font-size: 13px !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .form-compact.form-compact--force-tiny input.input-field,
+  .form-compact.form-compact--force-tiny select.input-field,
+  .form-compact.form-compact--force-tiny textarea.input-field,
+  .form-compact.form-compact--force-tiny .input-with-icon input,
+  .form-compact.form-compact--force-tiny input[type="date"].input-field {
+    font-size: 12px !important;
+  }
+
+  .form-compact.form-compact--force-tiny input.input-field::placeholder,
+  .form-compact.form-compact--force-tiny textarea.input-field::placeholder {
+    font-size: 12px !important;
+  }
+}
+
+/* Enhanced Mobile Experience CSS */
+
+/* Touch feedback animations */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* Enhanced button press animation */
+.button-press {
+  position: relative;
+  overflow: hidden;
+}
+
+.button-press::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.button-press:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Enhanced card hover effects for touch devices */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Better text rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Tim / Vendor Portal: Payment Slip Enhancements --- */
+/* Base styles for printable content */
+.printable-content {
+  background: #ffffff;
+  color: #0f172a;
+  /* slate-900 */
+}
+
+/* Compact typography rules for the Tim / Vendor payment slip */
+.print-slip-compact {
+  font-size: 0.9rem;
+  /* ~14.4px base */
+}
+
+.print-slip-compact h1 {
+  font-size: 1.5rem;
+}
+
+.print-slip-compact h2 {
+  font-size: 1.1rem;
+}
+
+.print-slip-compact h3 {
+  font-size: 1rem;
+}
+
+.print-slip-compact p,
+.print-slip-compact span,
+.print-slip-compact li {
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.print-slip-compact table {
+  font-size: 0.85rem;
+}
+
+.print-slip-compact th,
+.print-slip-compact td {
+  padding: 6px 8px;
+}
+
+.print-slip-compact .invoice-totals .font-bold {
+  font-size: 1rem;
+}
+
+.print-slip-compact .text-right,
+.print-slip-compact .tabular-nums,
+.print-slip-compact .amount {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 640px) {
+  .print-slip-compact {
+    font-size: 0.85rem;
+  }
+
+  .print-slip-compact table {
+    font-size: 0.8rem;
+  }
+
+  .print-slip-compact .invoice-totals .font-bold {
+    font-size: 0.95rem;
+  }
+
+  .print-slip-compact .text-right,
+  .print-slip-compact .tabular-nums,
+  .print-slip-compact .amount {
+    font-size: 0.9rem;
+  }
+}
+
+
+/* Prevent awkward page breaks in key blocks */
+.avoid-break {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Print-specific adjustments */
+
+/* Prevent text selection on UI elements */
+button,
+.button-primary,
+.button-secondary,
+nav,
+.nav-item,
+.stat-card-icon {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar while maintaining scroll functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
+}
+
+/* Mobile Tab Pills Enhancement */
+@media (max-width: 768px) {
+
+  /* Smooth scroll for horizontal tab navigation */
+  .scrollbar-hide {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Enhanced touch feedback for mobile tabs */
+  .mobile-tab-pill {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* Smooth transitions for tab content */
+  .tab-content-mobile {
+    animation: fadeInUp 0.3s ease-out;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+/* Enhanced focus states for accessibility */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Avoid double focus outline for our custom form controls (.input-field).
+   These controls already render their own focus styling (border/ring/box-shadow). */
+.input-field:focus-visible,
+.input-field:focus {
+  outline: none;
+}
+
+/* Touch-friendly spacing */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .touch-spacing {
+    margin: 8px;
+  }
+
+  /* Better readability on mobile */
+  .mobile-text-enhance {
+    line-height: 1.6;
+    font-size: max(16px, 1rem);
+  }
+}
+
+/* Enhanced Mobile Optimization - Comprehensive mobile styles */
+@media (max-width: 768px) {
+
+  /* Make text smaller on mobile */
+  body {
+    font-size: 14px !important;
+  }
+
+  /* Smaller headings */
+  h1 {
+    font-size: 1.5rem !important;
+    line-height: 1.2 !important;
+  }
+
+  h2 {
+    font-size: 1.25rem !important;
+    line-height: 1.3 !important;
+  }
+
+  h3 {
+    font-size: 1.1rem !important;
+    line-height: 1.4 !important;
+  }
+
+  h4 {
+    font-size: 1rem !important;
+    line-height: 1.4 !important;
+  }
+
+  h5,
+  h6 {
+    font-size: 0.9rem !important;
+    line-height: 1.4 !important;
+  }
+
+  /* Smaller text elements */
+  .text-sm {
+    font-size: 0.8rem !important;
+  }
+
+  .text-xs {
+    font-size: 0.7rem !important;
+  }
+
+  .text-lg {
+    font-size: 1rem !important;
+  }
+
+  .text-xl {
+    font-size: 1.1rem !important;
+  }
+
+  .text-2xl {
+    font-size: 1.2rem !important;
+  }
+
+  .text-3xl {
+    font-size: 1.3rem !important;
+  }
+
+  /* Smaller icons */
+  .w-4 {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .h-4 {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .w-5 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .h-5 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .w-6 {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .h-6 {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  .w-8 {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .h-8 {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  /* Smaller numbers and stats */
+  .stat-card-value {
+    font-size: 1.5rem !important;
+    line-height: 1.25 !important;
+    /* Relaxed for lists */
+  }
+
+  .stat-card-title {
+    font-size: 0.8rem !important;
+  }
+
+  /* Make modals wider on mobile */
+  .app-modal-dialog {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    margin: 0 2.5vw !important;
+  }
+
+  .chat-modal-dialog {
+    max-width: 95vw !important;
+    width: 95vw !important;
+    margin: 0 2.5vw !important;
+  }
+
+  /* Smaller buttons on mobile */
+  .button-primary,
+  .button-secondary {
+    font-size: 0.8rem !important;
+    padding: 8px 12px !important;
+    min-height: 36px !important;
+    border-radius: 8px !important;
+  }
+
+  .button-primary svg,
+  .button-secondary svg {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Smaller input elements */
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+    /* Prevents zoom on iOS */
+    padding: 10px 12px !important;
+  }
+
+  /* Smaller table text */
+  table th,
+  table td {
+    font-size: 0.8rem !important;
+    padding: 8px 6px !important;
+  }
+
+  /* Smaller navigation */
+  .bottom-nav {
+    padding: 8px 12px !important;
+    min-height: 56px !important;
+  }
+
+  .bottom-nav svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  .bottom-nav span {
+    font-size: 0.75rem !important;
+  }
+
+  /* Tighter spacing on mobile */
+  .p-4 {
+    padding: 12px !important;
+  }
+
+  .p-6 {
+    padding: 16px !important;
+  }
+
+  .p-8 {
+    padding: 20px !important;
+  }
+
+  .m-4 {
+    margin: 12px !important;
+  }
+
+  .m-6 {
+    margin: 16px !important;
+  }
+
+  .space-y-4>*+* {
+    margin-top: 12px !important;
+  }
+
+  .space-y-6>*+* {
+    margin-top: 16px !important;
+  }
+
+  /* Smaller cards */
+  .stat-card {
+    padding: 16px !important;
+    min-height: 80px !important;
+  }
+
+  .stat-card-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  /* Projects kanban - smooth horizontal scroll on mobile */
+  .projects-kanban-scroll {
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Form selects - ensure touch-friendly size for status dropdown */
+  .form-compact select,
+  .modal-content-area select {
+    min-height: 48px !important;
+  }
+
+  /* Compact modal content */
+  .modal-content-area {
+    padding: 16px !important;
+  }
+
+  .modal-content-area h1,
+  .modal-content-area h2,
+  .modal-content-area h3 {
+    margin-bottom: 12px !important;
+  }
+
+  /* Smaller form elements */
+  .input-field {
+    font-size: 16px !important;
+    padding: 10px 12px !important;
+    min-height: 40px !important;
+  }
+
+  .input-label {
+    font-size: 0.8rem !important;
+  }
+
+  /* Compact grid spacing */
+  .grid-cols-1 {
+    gap: 12px !important;
+  }
+
+  .grid-cols-2 {
+    gap: 12px !important;
+  }
+
+  .grid-cols-3 {
+    gap: 12px !important;
+  }
+
+  /* Smaller page headers */
+  .page-header h1 {
+    font-size: 1.5rem !important;
+    margin-bottom: 8px !important;
+  }
+
+  .page-header p {
+    font-size: 0.9rem !important;
+  }
+
+  /* Fix mobile filter overflow issues */
+  .mobile-filter-section {
+    /* Stack items vertically on mobile */
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .mobile-filter-section>div {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .mobile-filter-section input,
+  .mobile-filter-section select {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 16px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Fix date input overflow on mobile */
+  input[type="date"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Fix filter button container */
+  .filter-buttons-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .filter-buttons-container>* {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Fix search and filter row overflow */
+  .search-filter-row {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+
+  .search-filter-row>* {
+    min-width: calc(50% - 6px) !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Fix button groups that overflow */
+  .button-group-overflow {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+  }
+
+  .button-group-overflow>* {
+    flex: 0 1 auto !important;
+    min-width: 0 !important;
+  }
+
+  /* Fix tab navigation overflow */
+  .tab-navigation {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: flex-start !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .tab-navigation>* {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+
+  /* Fix action buttons that overflow */
+  .action-buttons-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+  }
+
+  .action-buttons-row>* {
+    flex: 0 1 auto !important;
+    min-width: calc(33.333% - 6px) !important;
+  }
+
+  /* Fix client table actions overflow */
+  .client-actions-cell {
+    min-width: 120px !important;
+  }
+
+  .client-actions-cell .flex {
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    justify-content: center !important;
+  }
+
+  .client-actions-cell button {
+    flex: 0 1 auto !important;
+    min-width: 32px !important;
+    padding: 6px !important;
+  }
+
+  /* Fix project summary cards overflow */
+  .project-summary-card {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  .project-summary-card>div:first-child {
+    width: 100% !important;
+  }
+
+  .project-summary-card .button-group {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  /* Fix payment input section overflow */
+  .payment-input-section {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+  }
+
+  .payment-input-section>* {
+    width: 100% !important;
+  }
+
+  .payment-input-section button {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Fix stats modal buttons overflow */
+  .stats-modal-actions {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    justify-content: center !important;
+  }
+
+  .stats-modal-actions>* {
+    flex: 0 1 auto !important;
+    min-width: calc(50% - 6px) !important;
+  }
+
+  /* Fix client form grid overflow */
+  .client-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .client-form-grid .input-group {
+    width: 100% !important;
+  }
+
+  /* Fix modal header buttons overflow */
+  .modal-header-buttons {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+  }
+
+  .modal-header-buttons>* {
+    flex: 0 1 auto !important;
+    min-width: calc(50% - 4px) !important;
+  }
+
+  /* Fix leads filter section overflow */
+  .leads-filter-section {
+    /* Stack items vertically on mobile */
+    flex-direction: column !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .leads-filter-section>div {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .leads-filter-section input,
+  .leads-filter-section select {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 16px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Fix leads filter button container */
+  .leads-filter-buttons {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .leads-filter-buttons>* {
+    flex: 0 1 auto !important;
+    min-width: calc(25% - 6px) !important;
+    max-width: calc(50% - 4px) !important;
+  }
+
+  /* Fix leads filter row with date inputs */
+  .leads-filter-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .leads-filter-row>* {
+    min-width: calc(50% - 4px) !important;
+    flex: 1 1 auto !important;
+  }
+
+  /* Fix source filter dropdown */
+  .leads-source-filter {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Fix leads action buttons */
+  .leads-action-buttons {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    justify-content: center !important;
+  }
+
+  .leads-action-buttons>* {
+    flex: 0 1 auto !important;
+    min-width: 40px !important;
+    padding: 8px !important;
+  }
+
+  /* Fix leads column containers */
+  .leads-column-container {
+    width: calc(100vw - 2rem) !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Fix leads column header */
+  .leads-column-header {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+    padding: 12px !important;
+  }
+
+  .leads-column-header>* {
+    width: 100% !important;
+  }
+
+  /* Fix leads card layout */
+  .leads-card {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .leads-card-header {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+
+  .leads-card-actions {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Fix dashboard main layout */
+  .dashboard-main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-stats-grid>* {
+    width: 100% !important;
+  }
+
+  /* Fix dashboard widget containers */
+  .dashboard-widget-container {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* Fix dashboard cards grid */
+  .dashboard-cards-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-cards-grid>* {
+    width: 100% !important;
+  }
+
+  /* Fix quick links widget */
+  .quick-links-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .quick-links-grid>* {
+    min-width: calc(50% - 6px) !important;
+    width: 100% !important;
+  }
+
+  /* Fix income chart widget */
+  .income-chart-container {
+    height: 300px !important;
+    width: 100% !important;
+  }
+
+  .income-chart-bars {
+    flex-direction: column !important;
+    height: 100% !important;
+    gap: 4px !important;
+  }
+
+  .income-chart-bars>* {
+    width: 100% !important;
+    height: auto !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+  }
+
+  /* Fix card widget layout */
+  .card-widget-container {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 160px !important;
+  }
+
+  .card-widget-container>* {
+    width: 100% !important;
+  }
+
+  /* Fix cards display in MyCardsWidget */
+  .cards-display-grid {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .cards-display-grid>* {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* Fix calendar widget */
+  .calendar-widget-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .calendar-widget-items {
+    min-width: 600px !important;
+  }
+
+  .calendar-item {
+    flex: 0 0 auto !important;
+    min-width: 250px !important;
+  }
+
+  /* Fix project status widget */
+  .project-status-container {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Fix leads summary widget */
+  .leads-summary-stats {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .leads-summary-stats>* {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  /* Fix client satisfaction widget */
+  .client-satisfaction-layout {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .client-satisfaction-rating {
+    justify-content: center !important;
+  }
+
+  /* Fix asset summary widget */
+  .asset-summary-layout {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  /* Fix recent transactions widget */
+  .recent-transactions-list {
+    gap: 12px !important;
+  }
+
+  .recent-transactions-list>* {
+    padding: 12px !important;
+  }
+
+  /* Fix modal content overflow */
+  .dashboard-modal-content {
+    max-height: calc(100vh - 120px) !important;
+    overflow-y: auto !important;
+  }
+
+  /* Fix stat cards layout */
+  .stat-card-mobile {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+
+  /* Fix invoice layout for mobile */
+  .print-invoice {
+    padding: 16px !important;
+  }
+
+  .print-invoice header {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice header>div:last-child {
+    text-align: left !important;
+  }
+
+  .print-invoice .doc-header-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice .doc-header-grid>div {
+    padding: 16px !important;
+  }
+
+  .print-invoice table {
+    font-size: 12px !important;
+  }
+
+  .print-invoice th,
+  .print-invoice td {
+    padding: 8px 4px !important;
+  }
+
+  .print-invoice .totals-section {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice .totals-section>div:first-child {
+    width: 100% !important;
+  }
+
+  .print-invoice .totals-section>div:last-child {
+    width: 100% !important;
+  }
+
+  .print-invoice .doc-footer-flex {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice .doc-footer-flex>div {
+    width: 100% !important;
+  }
+
+  .print-invoice footer {
+    margin-top: 24px !important;
+    padding-top: 16px !important;
+  }
+
+  .print-invoice footer>div {
+    margin-top: 12px !important;
+  }
+
+  /* Extra-compact invoice typography for small phones */
+  @media (max-width: 480px) {
+    .print-invoice {
+      padding: 12px !important;
+      font-size: 12px !important;
+      /* Base smaller text inside invoice */
+    }
+
+    .print-invoice header h1 {
+      font-size: 1rem !important;
+      /* Smaller Invoice title */
+      line-height: 1.2 !important;
+    }
+
+    /* Make address/phone/email lines smaller */
+    .print-invoice header p,
+    .print-invoice header span,
+    .print-invoice .doc-header-grid p,
+    .print-invoice .doc-header-grid span,
+    .print-invoice .contact-line,
+    .print-invoice .address-line {
+      font-size: 0.75rem !important;
+      line-height: 1.3 !important;
+    }
+
+    /* Smaller numbers and monetary amounts */
+    .print-invoice .tabular-nums,
+    .print-invoice .amount,
+    .print-invoice .text-right {
+      font-size: 11px !important;
+    }
+
+    /* Tighter table text on very small screens */
+    .print-invoice table {
+      font-size: 11px !important;
+    }
+
+    .print-invoice th,
+    .print-invoice td {
+      padding: 6px 4px !important;
+    }
+
+    /* Totals section: reduce emphasis size */
+    .print-invoice .totals-section .font-bold {
+      font-size: 0.9rem !important;
+    }
+
+    .print-invoice .totals-section .text-sm {
+      font-size: 0.75rem !important;
+    }
+
+    /* Generic printable area fallback (for invoices without .print-invoice class) */
+    .printable-area {
+      font-size: 12px !important;
+      padding: 12px !important;
+    }
+
+    .printable-area h1 {
+      font-size: 1rem !important;
+      line-height: 1.2 !important;
+    }
+
+    .printable-area h2 {
+      font-size: 0.95rem !important;
+      line-height: 1.25 !important;
+    }
+
+    .printable-area h3 {
+      font-size: 0.9rem !important;
+      line-height: 1.3 !important;
+    }
+
+    .printable-area h4,
+    .printable-area h5,
+    .printable-area h6 {
+      font-size: 0.85rem !important;
+      line-height: 1.3 !important;
+    }
+
+    .printable-area p,
+    .printable-area span,
+    .printable-area li {
+      font-size: 0.8rem !important;
+      line-height: 1.35 !important;
+    }
+
+    .printable-area table {
+      font-size: 11px !important;
+    }
+
+    .printable-area th,
+    .printable-area td {
+      padding: 6px 4px !important;
+    }
+
+    /* Contact/address lines commonly used in headers */
+    .printable-area .contact-line,
+    .printable-area .address-line,
+    .printable-area .meta-line {
+      font-size: 0.75rem !important;
+    }
+
+    /* Amounts and right-aligned numbers */
+    .printable-area .tabular-nums,
+    .printable-area .amount,
+    .printable-area .text-right {
+      font-size: 11px !important;
+    }
+  }
+
+  /* Fix receipt layout for mobile */
+  .print-receipt {
+    padding: 16px !important;
+  }
+
+  .print-receipt header h1 {
+    font-size: 18pt !important;
+  }
+
+  .print-receipt .printable-bg-green-light {
+    padding: 16px !important;
+  }
+
+  .print-receipt .printable-bg-green-light p {
+    font-size: 12pt !important;
+  }
+
+  .print-receipt .printable-bg-green-light p:first-child {
+    font-size: 14pt !important;
+  }
+
+  .print-receipt footer {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+
+  .print-receipt footer>div:last-child {
+    width: 100% !important;
+  }
+
+  /* Fix signature section for mobile */
+  .signature-section {
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+
+  .signature-section>div {
+    width: 100% !important;
+  }
+
+  /* Fix invoice table styling */
+  .invoice-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 16px 0 !important;
+  }
+
+  .invoice-table-header th {
+    background-color: #f8fafc !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+  }
+
+  .invoice-table-body tr {
+    transition: background-color 0.2s ease !important;
+  }
+
+  .invoice-table-body tr:hover {
+    background-color: #f8fafc !important;
+  }
+
+  .invoice-table-body td {
+    vertical-align: top !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+  }
+
+  .invoice-item-description {
+    max-width: 300px !important;
+  }
+
+  .invoice-item-description p {
+    margin: 0 !important;
+    line-height: 1.4 !important;
+  }
+
+  .invoice-item-description .text-xs {
+    color: #64748b !important;
+    font-style: italic !important;
+  }
+
+  /* Tabular numbers for better alignment */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums !important;
+    font-feature-settings: 'tnum' !important;
+  }
+
+  /* Mobile responsive invoice table - simple layout, no overlapping */
+  @media (max-width: 768px) {
+    .invoice-table {
+      font-size: 12px !important;
+    }
+
+    .invoice-table th,
+    .invoice-table td {
+      padding: 6px 4px !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+    }
+
+    .invoice-table th {
+      background-color: #f8fafc !important;
+      font-weight: 600 !important;
+    }
+
+    .invoice-item-description {
+      max-width: 100% !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .invoice-item-description p {
+      font-size: 12px !important;
+      line-height: 1.3 !important;
+    }
+
+    .invoice-item-description .text-xs {
+      font-size: 10px !important;
+      line-height: 1.2 !important;
+    }
+  }
+
+  /* Print styles for invoice table */
+
+  /* Fix responsive table headers */
+  .invoice-table th,
+  .invoice-table td {
+    position: relative !important;
+  }
+
+  .invoice-table th[data-label]:before,
+  .invoice-table td[data-label]:before {
+    content: attr(data-label) !important;
+    position: absolute !important;
+    left: 12px !important;
+    top: 12px !important;
+    font-size: 10px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    background-color: #f8fafc !important;
+    padding: 2px 6px !important;
+    border-radius: 3px !important;
+    z-index: 10 !important;
+  }
+
+  @media (max-width: 640px) {
+
+    .invoice-table th:not(:first-child),
+    .invoice-table td:not(:first-child) {
+      text-align: right !important;
+    }
+
+    .invoice-table th:first-child:before,
+    .invoice-table td:first-child:before {
+      display: none !important;
+    }
+  }
+
+  .invoice-item-description .text-right {
+    text-align: right !important;
+  }
+
+  /* Fix invoice totals section */
+  .invoice-totals {
+    background-color: #f8fafc !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+  }
+
+  .invoice-totals .flex {
+    align-items: center !important;
+  }
+
+  .invoice-totals .font-bold {
+    color: #1e293b !important;
+  }
+
+  .invoice-signature-section {
+    background-color: #ffffff !important;
+    padding: 16px !important;
+    border-radius: 8px !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+  }
+
+  .invoice-signature-section h4 {
+    color: #475569 !important;
+    font-size: 14px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* Mobile responsive invoice totals */
+  @media (max-width: 768px) {
+    .invoice-totals {
+      padding: 12px !important;
+      margin-bottom: 16px !important;
+    }
+
+    .invoice-totals .text-sm {
+      font-size: 12px !important;
+    }
+
+    .invoice-totals .font-bold {
+      font-size: 14px !important;
+    }
+
+    .invoice-signature-section {
+      padding: 12px !important;
+    }
+
+    .invoice-signature-section h4 {
+      font-size: 12px !important;
+    }
+  }
+
+  /* Print styles for invoice totals */
+
+  /* Ensure proper text alignment in invoice */
+  .text-left {
+    text-align: left !important;
+  }
+
+  .text-center {
+    text-align: center !important;
+  }
+
+  .text-right {
+    text-align: right !important;
+  }
+
+  /* Fix column headers for better alignment */
+  .invoice-table th:first-child {
+    width: 40% !important;
+  }
+
+  .invoice-table th:nth-child(2) {
+    width: 15% !important;
+  }
+
+  .invoice-table th:nth-child(3),
+  .invoice-table th:nth-child(4) {
+    width: 22.5% !important;
+  }
+
+  /* Tabular numbers for better alignment */
+  .tabular-nums {
+    font-variant-numeric: tabular-nums !important;
+    font-feature-settings: 'tnum' !important;
+  }
+
+  /* Invoice item description styling */
+  .invoice-item-description {
+    max-width: 300px !important;
+    word-wrap: break-word !important;
+    hyphens: auto !important;
+  }
+
+  .invoice-item-description p {
+    margin: 0 !important;
+    line-height: 1.4 !important;
+  }
+
+  .invoice-item-description .text-xs {
+    color: #64748b !important;
+    font-style: italic !important;
+  }
+
+}
+
+/* Button styles for primary actions - Enhanced with better hover states and accessibility */
+@media (max-width: 480px) {
+  body {
+    font-size: 13px !important;
+  }
+
+  /* Even smaller text */
+  h1 {
+    font-size: 1.3rem !important;
+  }
+
+  h2 {
+    font-size: 1.15rem !important;
+  }
+
+  h3 {
+    font-size: 1rem !important;
+  }
+
+  .text-sm {
+    font-size: 0.75rem !important;
+  }
+
+  .text-xs {
+    font-size: 0.65rem !important;
+  }
+
+  /* Smaller icons */
+  .w-4 {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .h-4 {
+    width: 12px !important;
+    height: 12px !important;
+  }
+
+  .w-5 {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .h-5 {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  .w-6 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .h-6 {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* Make modals almost full width */
+  .app-modal-dialog,
+  .chat-modal-dialog {
+    max-width: 98vw !important;
+    width: 98vw !important;
+    margin: 0 1vw !important;
+  }
+
+  /* Even smaller buttons */
+  .button-primary,
+  .button-secondary {
+    font-size: 0.75rem !important;
+    padding: 6px 10px !important;
+    min-height: 32px !important;
+  }
+
+  .button-primary svg,
+  .button-secondary svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+
+  /* Compact navigation */
+  .bottom-nav {
+    padding: 6px 8px !important;
+    min-height: 52px !important;
+  }
+
+  .bottom-nav svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+
+  /* Very compact spacing */
+  .p-4 {
+    padding: 8px !important;
+  }
+
+  .p-6 {
+    padding: 12px !important;
+  }
+
+  .p-8 {
+    padding: 16px !important;
+  }
+}
+
+/* Loading skeleton animation */
+@keyframes skeleton-loading {
+  0% {
+    background-position: -200px 0;
+  }
+
+  100% {
+    background-position: calc(200px + 100%) 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200px 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+/* Enhanced accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .button-primary {
+    border: 2px solid currentColor;
+  }
+
+  .card-hover {
+    border: 1px solid currentColor;
+  }
+}
+
+/* Top-level mobile overrides for invoice so they are not nested and will apply */
+@media (max-width: 768px) {
+
+  /* Invoice container spacing */
+  .print-invoice {
+    padding: 16px !important;
+  }
+
+  .print-invoice header {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice header>div:last-child {
+    text-align: left !important;
+  }
+
+  .print-invoice .doc-header-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice .doc-header-grid>div {
+    padding: 16px !important;
+  }
+
+  .print-invoice table {
+    font-size: 12px !important;
+  }
+
+  .print-invoice th,
+  .print-invoice td {
+    padding: 8px 4px !important;
+  }
+
+  .print-invoice .totals-section {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .print-invoice .doc-footer-flex {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* Extra-compact invoice and generic printable area on small phones */
+  .print-invoice,
+  .printable-area {
+    padding: 8px !important;
+    font-size: 12px !important;
+  }
+
+  .print-invoice header h1,
+  .printable-area h1 {
+    font-size: 1rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .printable-area h2 {
+    font-size: 0.95rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .printable-area h3 {
+    font-size: 0.9rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .printable-area h4,
+  .printable-area h5,
+  .printable-area h6 {
+    font-size: 0.85rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .print-invoice header p,
+  .print-invoice header span,
+  .print-invoice .doc-header-grid p,
+  .print-invoice .doc-header-grid span,
+  .print-invoice .contact-line,
+  .print-invoice .address-line,
+  .printable-area p,
+  .printable-area span,
+  .printable-area li {
+    font-size: 0.8rem !important;
+    line-height: 1.35 !important;
+  }
+
+  .print-invoice table,
+  .printable-area table {
+    font-size: 11px !important;
+  }
+
+  .print-invoice th,
+  .print-invoice td,
+  .printable-area th,
+  .printable-area td {
+    padding: 6px 4px !important;
+  }
+
+  .print-invoice .tabular-nums,
+  .print-invoice .amount,
+  .print-invoice .text-right,
+  .printable-area .tabular-nums,
+  .printable-area .amount,
+  .printable-area .text-right {
+    font-size: 11px !important;
+  }
+
+  /* Client Portal specific tightening */
+  .template-wrapper .print-invoice header h2 {
+    /* "Invoice" title */
+    font-size: 0.85rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .template-wrapper .print-invoice p,
+  .template-wrapper .print-invoice span,
+  .template-wrapper .print-invoice li {
+    font-size: 0.7rem !important;
+    line-height: 1.3 !important;
+  }
+
+  .template-wrapper .print-invoice .font-extrabold {
+    /* big amount in blue box */
+    font-size: 0.9rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .template-wrapper .print-invoice .font-bold {
+    font-size: 0.85rem !important;
+  }
+
+  .template-wrapper .print-invoice .invoice-table {
+    font-size: 9px !important;
+  }
+
+  .template-wrapper .print-invoice .tabular-nums,
+  .template-wrapper .print-invoice .amount,
+  .template-wrapper .print-invoice .text-right {
+    font-size: 10px !important;
+  }
+}
+
+/* Ultra-compact for very small phones */
+@media (max-width: 380px) {
+  .template-wrapper .print-invoice header h2 {
+    font-size: 0.8rem !important;
+  }
+
+  .template-wrapper .print-invoice p,
+  .template-wrapper .print-invoice span,
+  .template-wrapper .print-invoice li {
+    font-size: 0.6rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .template-wrapper .print-invoice header p,
+  .template-wrapper .print-invoice header span {
+    font-size: 0.6rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .template-wrapper .print-invoice .font-extrabold {
+    font-size: 0.85rem !important;
+  }
+
+  .template-wrapper .print-invoice .font-bold {
+    font-size: 0.8rem !important;
+  }
+
+  .template-wrapper .print-invoice .invoice-table {
+    font-size: 8px !important;
+  }
+
+  .template-wrapper .print-invoice th,
+  .template-wrapper .print-invoice td {
+    padding: 4px 3px !important;
+  }
+
+  /* extra-compact container padding on very small phones */
+  .print-invoice,
+  .printable-area {
+    padding: 6px !important;
+  }
+}
+
+/* Enhanced print styles for modal-based documents (Invoice/Receipt/Contract) */
+/* A4 with Indonesian standard margins: 2.5cm left/right, 2cm top/bottom */
+@page {
+  size: A4 portrait;
+  margin: 2cm 2.5cm;
+}
+
+
+
+/* Button styles for primary actions - Enhanced with better hover states and accessibility */
+.button-primary {
+  background-color: hsl(var(--brand-accent));
+  color: white;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  text-decoration: none;
+  user-select: none;
+}
+
+.button-primary:hover {
+  background-color: hsl(var(--brand-accent-hover, var(--brand-accent)));
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.button-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.button-primary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(var(--brand-accent-rgb, 59, 130, 246), 0.5);
+}
+
+.button-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  opacity: 0.5;
+  transform: none;
+  box-shadow: none;
+}
+
+.button-primary:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+/* Button styles for secondary actions */
+.button-secondary {
+  background-color: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #1d4ed8;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  text-decoration: none;
+  user-select: none;
+}
+
+.button-secondary:hover {
+  background-color: #1d4ed8;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px 0 rgba(37, 99, 235, 0.3);
+}
+
+.button-secondary:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  background-color: #1e40af;
+}
+
+.button-secondary:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.5);
+}
+
+.button-secondary:disabled {
+  background-color: #93c5fd;
+  color: #ffffff;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Mobile small phones: shrink input/select text size on non-iOS devices to avoid iOS zoom */
+@media (max-width: 480px) {
+
+  /* Exclude iOS by checking html:not(.ios) set in index.html */
+  html:not(.ios) input,
+  html:not(.ios) textarea,
+  html:not(.ios) select,
+  html:not(.ios) .input-field,
+  html:not(.ios) select.input-field {
+    font-size: 14px !important;
+  }
+
+  html:not(.ios) input::placeholder,
+  html:not(.ios) textarea::placeholder {
+    font-size: 14px !important;
+  }
+}
+
+/* Also shrink floating labels and helper text on small phones (non-iOS) */
+@media (max-width: 480px) {
+  html:not(.ios) .input-label {
+    font-size: 12px !important;
+  }
+
+  html:not(.ios) .input-helper-text {
+    font-size: 12px !important;
+  }
+
+  /* Compact input/select spacing */
+  html:not(.ios) .input-field {
+    min-height: 36px !important;
+    padding: 8px 10px !important;
+    line-height: 1.3 !important;
+  }
+
+  html:not(.ios) select.input-field {
+    padding-right: 2.5rem !important;
+  }
+}
+
+/* Mobile Compact Form: shrink Text Field, Select, keep Textarea multi-line, and tighten form spacing */
+@media (max-width: 768px) {
+
+  /* Apply to forms wrapped with .form-compact to avoid global side effects */
+  .form-compact {
+    gap: 12px !important;
+  }
+
+  .form-compact .form-group,
+  .form-compact .input-group {
+    margin-bottom: 10px !important;
+  }
+
+  /* Text Field (single line) */
+  .form-compact input.input-field {
+    font-size: 16px !important;
+    /* prevent iOS zoom */
+    min-height: 40px !important;
+    padding: 10px 12px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* Dropdown / Select Field */
+  .form-compact select.input-field {
+    font-size: 16px !important;
+    /* prevent iOS zoom */
+    min-height: 40px !important;
+    padding: 10px 2.5rem 10px 12px !important;
+    /* keep arrow space */
+    line-height: 1.3 !important;
+    background-position: right 0.75rem center !important;
+  }
+
+  /* Textarea (multi-line) */
+  .form-compact textarea.input-field {
+    font-size: 16px !important;
+    /* prevent iOS zoom */
+    min-height: 140px !important;
+    /* bigger box, many lines */
+    padding: 10px 12px !important;
+    line-height: 1.5 !important;
+    resize: vertical !important;
+  }
+
+  /* Labels and helper text slightly smaller but readable */
+  .form-compact .input-label {
+    font-size: 0.9rem !important;
+  }
+
+  .form-compact .input-helper-text {
+    font-size: 0.8rem !important;
+  }
+
+  /* Form container padding (optional) */
+  .form-compact .form-body,
+  .form-compact form {
+    padding: 8px !important;
+  }
+}
+
+/* Extra small phones: allow smaller typography on non-iOS only to avoid zoom */
+@media (max-width: 480px) {
+
+  html:not(.ios) .form-compact input.input-field,
+  html:not(.ios) .form-compact select.input-field {
+    font-size: 14px !important;
+    min-height: 36px !important;
+    padding: 8px 10px !important;
+  }
+
+  html:not(.ios) .form-compact select.input-field {
+    padding-right: 2.25rem !important;
+    background-position: right 0.6rem center !important;
+  }
+
+  html:not(.ios) .form-compact textarea.input-field {
+    font-size: 14px !important;
+    min-height: 160px !important;
+    /* keep textarea comfortably large */
+    padding: 8px 10px !important;
+    line-height: 1.45 !important;
+  }
+
+  html:not(.ios) .form-compact .input-label {
+    font-size: 0.85rem !important;
+  }
+
+  html:not(.ios) .form-compact .input-helper-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+/* OPTIONAL: Force smaller input/select text even on iOS (may cause iOS zoom on focus) */
+@media (max-width: 768px) {
+
+  .form-compact.form-compact--force-small input.input-field,
+  .form-compact.form-compact--force-small select.input-field,
+  .form-compact.form-compact--force-small textarea.input-field,
+  .form-compact.form-compact--force-small .input-with-icon input,
+  .form-compact.form-compact--force-small input[type="date"].input-field {
+    font-size: 15px !important;
+  }
+
+  .form-compact.form-compact--force-small input.input-field::placeholder,
+  .form-compact.form-compact--force-small textarea.input-field::placeholder {
+    font-size: 15px !important;
+  }
+
+  .form-compact.form-compact--force-small .input-label {
+    font-size: 0.85rem !important;
+  }
+
+  .form-compact.form-compact--force-small .input-helper-text {
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .form-compact.form-compact--force-small input.input-field,
+  .form-compact.form-compact--force-small select.input-field,
+  .form-compact.form-compact--force-small textarea.input-field,
+  .form-compact.form-compact--force-small .input-with-icon input,
+  .form-compact.form-compact--force-small input[type="date"].input-field {
+    font-size: 14px !important;
+  }
+
+  .form-compact.form-compact--force-small input.input-field::placeholder,
+  .form-compact.form-compact--force-small textarea.input-field::placeholder {
+    font-size: 14px !important;
+  }
+
+  .form-compact.form-compact--force-small .input-label {
+    font-size: 0.8rem !important;
+  }
+
+  .form-compact.form-compact--force-small .input-helper-text {
+    font-size: 0.7rem !important;
+  }
+}

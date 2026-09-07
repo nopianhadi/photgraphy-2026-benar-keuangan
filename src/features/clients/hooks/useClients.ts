@@ -1,0 +1,125 @@
+import { useState, useMemo, useCallback } from 'react';
+import { Client, Project, Transaction, Card, FinancialPocket, Notification, ClientStatus, PaymentStatus } from '../../../types';
+import { createClient, updateClient, deleteClient } from '../../../services/clients';
+import { createProject, updateProject, deleteProject } from '../../../services/projects';
+import { ensureOnlineOrNotify } from '../utils/clientHelpers';
+import { formatCurrency } from '../../../utils/currency';
+
+export const useClients = (
+    clients: Client[],
+    setClients: React.Dispatch<React.SetStateAction<Client[]>>,
+    projects: Project[],
+    setProjects: React.Dispatch<React.SetStateAction<Project[]>>,
+    transactions: Transaction[],
+    setTransactions: React.Dispatch<React.SetStateAction<Transaction[]>>,
+    showNotification: (message: string) => void,
+    cards: Card[],
+    setCards: React.Dispatch<React.SetStateAction<Card[]>>,
+    totals: any
+) => {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>('Semua Status');
+    const [monthFilter, setMonthFilter] = useState('');
+    const [dateFrom, setDateFrom] = useState('');
+    const [dateTo, setDateTo] = useState('');
+
+    const allClientData = useMemo(() => {
+        return clients.map(client => {
+            const clientProjects = projects.filter(p => p.clientId === client.id);
+            const totalValue = clientProjects.reduce((sum, p) => sum + p.totalCost, 0);
+            const totalPaid = clientProjects.reduce((sum, p) => sum + p.amountPaid, 0);
+
+            const mostRecentProject = clientProjects.length > 0
+                ? [...clientProjects].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0]
+                : null;
+
+            return {
+                ...client,
+                projects: clientProjects,
+                totalProjectValue: totalValue,
+                balanceDue: totalValue - totalPaid,
+                PackageTerbaru: mostRecentProject ? `${mostRecentProject.packageName}${mostRecentProject.addOns.length > 0 ? ` + ${mostRecentProject.addOns.length} Add-on` : ''}` : 'Belum ada Acara Pernikahan',
+                overallPaymentStatus: mostRecentProject ? mostRecentProject.paymentStatus : null,
+                mostRecentProject: mostRecentProject,
+            };
+        });
+    }, [clients, projects]);
+
+    const filteredClientData = useMemo(() => {
+        return allClientData.filter(client => {
+            const searchMatch = searchTerm === '' ||
+                client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                client.phone.toLowerCase().includes(searchTerm.toLowerCase());
+
+            const statusMatch = statusFilter === 'Semua Status' || client.overallPaymentStatus === statusFilter;
+
+            const from = dateFrom ? new Date(dateFrom) : null;
+            const to = dateTo ? new Date(dateTo) : null;
+            if (from) from.setHours(0, 0, 0, 0);
+            if (to) to.setHours(23, 59, 59, 999);
+            const dateMatchRange = (!from && !to) || client.projects.some(p => {
+                const projectDate = new Date(p.date);
+                return (!from || projectDate >= from) && (!to || projectDate <= to);
+            });
+
+            return searchMatch && statusMatch && dateMatchRange;
+        });
+    }, [allClientData, searchTerm, statusFilter, dateFrom, dateTo]);
+
+    const clientStats = useMemo(() => {
+        const totalReceivables = allClientData.reduce((sum, c) => sum + c.balanceDue, 0);
+        const locationCounts: Record<string, number> = {};
+        allClientData.forEach(c => {
+            c.projects.forEach(p => {
+                if (p.location) {
+                    locationCounts[p.location] = (locationCounts[p.location] || 0) + 1;
+                }
+            });
+        });
+        const topLocationEntry = Object.entries(locationCounts).sort(([, a], [, b]) => b - a)[0];
+        const mostFrequentLocation = topLocationEntry ? topLocationEntry[0] : '-';
+
+        return {
+            activeClients: totals.activeClients,
+            totalReceivables: formatCurrency(totalReceivables),
+            totalClients: totals.clients,
+            mostFrequentLocation
+        };
+    }, [allClientData, totals]);
+
+    const handleDeleteClient = useCallback(async (clientId: string) => {
+        if (!window.confirm('Menghapus pengantin akan menghapus semua Acara Pernikahan dan transaksi terkait. Apakah Anda yakin?')) return;
+
+        if (!ensureOnlineOrNotify(showNotification)) return;
+        try {
+            await deleteClient(clientId);
+            setClients(prev => prev.filter(c => c.id !== clientId));
+            const projectsToDelete = projects.filter(p => p.clientId === clientId).map(p => p.id);
+            setProjects(prev => prev.filter(p => p.clientId !== clientId));
+            setTransactions(prev => prev.filter(t => !projectsToDelete.includes(t.projectId || '')));
+            showNotification('Pengantin berhasil dihapus.');
+            return true;
+        } catch (err) {
+            showNotification(!navigator.onLine ? 'Harus online untuk melakukan perubahan' : 'Gagal menghapus pengantin di database. Coba lagi.');
+            return false;
+        }
+    }, [clients, projects, setClients, setProjects, setTransactions, showNotification]);
+
+    return {
+        searchTerm,
+        setSearchTerm,
+        statusFilter,
+        setStatusFilter,
+        monthFilter,
+        setMonthFilter,
+        dateFrom,
+        setDateFrom,
+        dateTo,
+        setDateTo,
+        allClientData,
+        filteredClientData,
+        clientStats,
+        handleDeleteClient
+    };
+};
