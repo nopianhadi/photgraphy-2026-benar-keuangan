@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Package, AddOn, Project, PhysicalItem, Profile, REGIONS, Region, DurationOption } from '../../types';
-import PageHeader from '../../layouts/PageHeader';
 import Modal from '../../shared/ui/Modal';
 import { PencilIcon, Trash2Icon, PlusIcon, Share2Icon, FileTextIcon, CameraIcon, ChevronDownIcon, PackageIcon } from '../../constants';
 import RupiahInput from '../../shared/form/RupiahInput';
@@ -62,6 +61,7 @@ const Packages: React.FC<PackagesProps> = ({ packages, setPackages, addOns, setA
     const [isShareModalOpen, setIsShareModalOpen] = useState(false);
     const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
     const [expandedDurationIndex, setExpandedDurationIndex] = useState<number | null>(null);
+    const [viewMode, setViewMode] = useState<'cards' | 'table'>('cards');
 
     // --- Copy/Duplicate Package state ---
     const [copySourcePkg, setCopySourcePkg] = useState<Package | null>(null);
@@ -489,205 +489,434 @@ const Packages: React.FC<PackagesProps> = ({ packages, setPackages, addOns, setA
     };
 
     return (
-        <div className="space-y-6 md:space-y-8 animate-fade-in pb-8">
-            <PageHeader title="Package Vendor" subtitle="Kelola portofolio Package, opsi durasi, dan item tambahan (add-ons)." icon={<PackageIcon className="w-6 h-6" />}>
+        <div className="space-y-5 animate-fade-in pb-8">
+            {/* ── Page header ──────────────────────────────────────────────── */}
+            <div className="flex flex-wrap items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-purple-500/15 border border-purple-400/30 flex items-center justify-center flex-shrink-0">
+                        <PackageIcon className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <div>
+                        <h1 className="text-lg font-bold text-brand-text-light leading-tight">Package Vendor</h1>
+                        <p className="text-xs text-brand-text-secondary hidden sm:block">Kelola portofolio Package, opsi durasi, dan item tambahan.</p>
+                    </div>
+                </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <button onClick={() => setIsInfoModalOpen(true)} className="button-secondary !py-2 !px-3 text-xs md:text-sm">Panduan</button>
-                    <button onClick={() => setIsShareModalOpen(true)} className="button-secondary !py-2 !px-3 text-xs md:text-sm inline-flex items-center gap-2">
-                        <Share2Icon className="w-4 h-4" /> Bagikan
+                    <button onClick={() => setIsInfoModalOpen(true)} className="button-secondary !py-2 !px-3 text-xs">Panduan</button>
+                    <button onClick={() => setIsShareModalOpen(true)} className="button-secondary !py-2 !px-3 text-xs inline-flex items-center gap-1.5">
+                        <Share2Icon className="w-3.5 h-3.5" /> Bagikan
                     </button>
-                    <button onClick={() => setPackageEditMode('new')} className="button-primary !py-2 !px-4 text-xs md:text-sm inline-flex items-center gap-2 whitespace-nowrap">
-                        <PlusIcon className="w-4 h-4 md:w-5 md:h-5" /> Tambah Package
+                    <button onClick={() => setPackageEditMode('new')} className="button-primary !py-2 !px-4 text-xs inline-flex items-center gap-1.5 whitespace-nowrap">
+                        <PlusIcon className="w-4 h-4" /> Tambah Package
                     </button>
                 </div>
-            </PageHeader>
-            <div className="flex flex-wrap gap-2 pb-2">
-                <button
-                    onClick={() => setRegionFilter('')}
-                    className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all border ${regionFilter === '' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200'}`}
-                >
-                    Semua
-                </button>
-                {unionRegions.map(r => (
-                    <button
-                        key={r.value}
-                        onClick={() => setRegionFilter(r.value as any)}
-                        className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all border ${regionFilter === (r.value as any) ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-white text-slate-600 hover:text-slate-900 hover:bg-slate-50 border-slate-200'}`}
-                    >
-                        {r.label}
-                    </button>
-                ))}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                <div className="lg:col-span-2 space-y-8">
-                    {(Object.entries(packagesByCategory) as [string, Package[]][]).map(([category, pkgs]) => (
-                        <div key={category}>
-                            <h3 className="text-lg md:text-xl font-bold text-gradient mb-3 md:mb-4">{category}</h3>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                                {pkgs.map(pkg => (
-                                    <div key={pkg.id} className="glass-card card-hover-lift rounded-3xl flex flex-col overflow-hidden border border-brand-border/50 group">
-                                        {pkg.coverImage ? (
-                                            <div className="h-32 md:h-44 overflow-hidden relative">
-                                                <img src={pkg.coverImage} alt={pkg.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy" />
-                                                <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-slate-400 to-transparent"></div>
-                                            </div>
-                                        ) : (
-                                            <div className="h-32 md:h-44 bg-brand-input/50 flex flex-col items-center justify-center relative overflow-hidden text-brand-text-secondary/50">
-                                                <CameraIcon className="w-10 md:w-12 h-10 md:h-12 mb-2 opacity-50" />
-                                                <span className="text-[10px] font-medium uppercase tracking-wider opacity-70">Tanpa Cover</span>
-                                            </div>
-                                        )}
-                                        <div className="p-4 md:p-5 flex-grow flex flex-col bg-brand-surface/40">
-                                            <h4 className="font-bold text-base md:text-lg text-brand-text-light flex items-start justify-between gap-2">
-                                                <span className="line-clamp-2">{pkg.name}</span>
-                                            </h4>
-
-                                            <div className="mt-3 mb-4 p-3 bg-brand-bg/50 rounded-xl border border-brand-border/40">
-                                                <p className="text-xl md:text-2xl font-bold text-brand-text-light">
-                                                    {pkg.durationOptions && pkg.durationOptions.length > 0 ? (
-                                                        <span className="block text-xs md:text-sm font-semibold text-brand-text-secondary space-y-1">
-                                                            {pkg.durationOptions.map((o, i) => (
-                                                                <span key={i} className="block flex justify-between items-center border-b border-brand-border/30 pb-1 last:border-0 last:pb-0">
-                                                                    <span className="opacity-80 truncate pr-2">{o.label}</span>
-                                                                    <span className="text-brand-accent flex-shrink-0">{formatCurrency(o.price)}</span>
-                                                                </span>
-                                                            ))}
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-brand-accent">{formatCurrency(pkg.price)}</span>
-                                                    )}
-                                                </p>
-                                            </div>
-
-                                            <div className="text-xs space-y-3 flex-grow bg-white/30 p-3 rounded-xl border border-white/40 shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
-                                                {pkg.processingTime && (
-                                                    <p className="flex justify-between items-center pb-2 border-b border-brand-border/40">
-                                                        <span className="text-brand-text-secondary font-medium uppercase tracking-wider text-[9px]">Pengerjaan</span>
-                                                        <span className="font-semibold text-brand-text-light">{pkg.processingTime}</span>
-                                                    </p>
-                                                )}
-                                                {(pkg.photographers || pkg.videographers) && (
-                                                    <div className="pb-2 border-b border-brand-border/40">
-                                                        <h5 className="font-semibold text-brand-text-secondary text-[9px] uppercase tracking-wider mb-1">Tim</h5>
-                                                        <p className="font-medium text-brand-text-light">{[pkg.photographers, pkg.videographers].filter(Boolean).join(' & ')}</p>
-                                                    </div>
-                                                )}
-                                                {pkg.digitalItems.length > 0 && (
-                                                    <div className="pb-2 border-b border-brand-border/40 last:border-0 last:pb-0">
-                                                        <h5 className="font-semibold text-brand-text-secondary text-[9px] uppercase tracking-wider mb-1.5">Deskripsi Package</h5>
-                                                        <ul className="space-y-1">
-                                                            {pkg.digitalItems.map((item, i) => (
-                                                                <li key={i} className="flex items-start gap-1.5 text-brand-text-light font-medium before:content-[''] before:w-1 before:h-1 before:bg-brand-accent/50 before:rounded-full before:mt-1.5 text-[10px] md:text-xs leading-tight">
-                                                                    {item}
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                                {pkg.physicalItems.length > 0 && (
-                                                    <div className="pt-1">
-                                                        <h5 className="font-semibold text-brand-text-secondary text-[9px] uppercase tracking-wider mb-1.5">Vendor (Allpackage)</h5>
-                                                        <ul className="space-y-1">
-                                                            {pkg.physicalItems.map((item, i) => (
-                                                                <li key={i} className="flex justify-between items-center text-brand-text-light font-medium bg-brand-surface/50 px-2 py-1 rounded-md border border-brand-border/30 text-[10px] md:text-xs">
-                                                                    <span className="truncate pr-2 opacity-90">{item.name}</span>
-                                                                </li>
-                                                            ))}
-                                                        </ul>
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="flex gap-2 mt-4 pt-4 border-t border-brand-border/50">
-                                                <button onClick={() => handlePackageEdit(pkg)} className="button-secondary flex-1 text-xs py-2 shadow-sm">
-                                                    <PencilIcon className="w-4 h-4" /> Edit
-                                                </button>
-                                                <button
-                                                    onClick={() => handleOpenCopyModal(pkg)}
-                                                    className="button-secondary !p-2 md:!p-2.5 text-brand-text-secondary hover:text-brand-accent hover:border-brand-accent/50 hover:bg-brand-accent/5 flex-shrink-0"
-                                                    title="Duplikasi Package ke wilayah lain"
-                                                    aria-label={`Duplikasi Package ${pkg.name}`}
-                                                >
-                                                    <CopyIcon className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => handlePackageDelete(pkg.id)} className="button-secondary !p-2 md:!p-2.5 text-brand-text-secondary hover:text-red-600 hover:border-red-300 hover:bg-red-50 flex-shrink-0" title="Hapus Package" aria-label={`Hapus Package ${pkg.name}`}><Trash2Icon className="w-4 h-4" /></button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
+            {/* ── Stat cards ───────────────────────────────────────────────── */}
+            {(() => {
+                const filteredPkgs = regionFilter ? packages.filter(p => (p.region ? p.region.toLowerCase() === regionFilter.toLowerCase() : false)) : packages;
+                const filteredAddons = regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns;
+                const cats = new Set(filteredPkgs.map(p => p.category || 'Tanpa Kategori'));
+                const allPrices = filteredPkgs.flatMap(p => p.durationOptions && p.durationOptions.length > 0 ? p.durationOptions.map(o => o.price) : [p.price]);
+                const minPrice = allPrices.length > 0 ? Math.min(...allPrices) : 0;
+                const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 0;
+                return (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <div className="bg-gradient-to-br from-purple-500/15 via-violet-500/10 to-fuchsia-400/8 border border-purple-400/40 rounded-2xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-purple-500/25 flex items-center justify-center flex-shrink-0">
+                                <PackageIcon className="w-5 h-5 text-purple-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-brand-text-secondary">Total Package</p>
+                                <p className="text-2xl font-bold text-brand-text-light">{filteredPkgs.length}</p>
                             </div>
                         </div>
+                        <div className="bg-gradient-to-br from-blue-500/15 via-indigo-500/10 to-cyan-400/8 border border-blue-400/40 rounded-2xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-500/25 flex items-center justify-center flex-shrink-0">
+                                <PlusIcon className="w-5 h-5 text-blue-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-brand-text-secondary">Total Add-On</p>
+                                <p className="text-2xl font-bold text-brand-text-light">{filteredAddons.length}</p>
+                            </div>
+                        </div>
+                        <div className="bg-gradient-to-br from-emerald-500/15 via-green-500/10 to-teal-400/8 border border-emerald-400/40 rounded-2xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-emerald-500/25 flex items-center justify-center flex-shrink-0">
+                                <FileTextIcon className="w-5 h-5 text-emerald-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-brand-text-secondary">Kategori</p>
+                                <p className="text-2xl font-bold text-brand-text-light">{cats.size}</p>
+                            </div>
+                        </div>
+                        <div className="bg-gradient-to-br from-orange-500/15 via-amber-500/10 to-yellow-400/8 border border-orange-400/40 rounded-2xl p-4 flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-orange-500/25 flex items-center justify-center flex-shrink-0">
+                                <FileTextIcon className="w-5 h-5 text-orange-600" />
+                            </div>
+                            <div>
+                                <p className="text-xs text-brand-text-secondary">Harga</p>
+                                <p className="text-sm font-bold text-brand-text-light leading-tight">
+                                    {allPrices.length > 0
+                                        ? `${new Intl.NumberFormat('id-ID', { notation: 'compact', style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(minPrice)}
+                                        – ${new Intl.NumberFormat('id-ID', { notation: 'compact', style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(maxPrice)}`
+                                        : '—'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                );
+            })()}
+
+            {/* ── Region filter pills + view toggle ────────────────────────── */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex flex-wrap gap-2">
+                    <button
+                        onClick={() => setRegionFilter('')}
+                        className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${regionFilter === '' ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-brand-surface text-brand-text-secondary hover:text-brand-text-light border-brand-border'}`}
+                    >Semua</button>
+                    {unionRegions.map(r => (
+                        <button key={r.value} onClick={() => setRegionFilter(r.value as any)}
+                            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border ${regionFilter === (r.value as any) ? 'bg-blue-600 text-white border-blue-600 shadow-md' : 'bg-brand-surface text-brand-text-secondary hover:text-brand-text-light border-brand-border'}`}
+                        >{r.label}</button>
                     ))}
                 </div>
+                {/* View toggle */}
+                <div className="flex rounded-lg border border-brand-border overflow-hidden flex-shrink-0">
+                    <button onClick={() => setViewMode('cards')}
+                        className={`px-3 py-1.5 text-xs font-semibold transition-colors flex items-center gap-1 ${viewMode === 'cards' ? 'bg-brand-accent text-white' : 'bg-brand-surface text-brand-text-secondary hover:bg-brand-bg'}`}
+                        title="Tampilan Kartu">
+                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16"><rect x="1" y="1" width="6" height="6" rx="1"/><rect x="9" y="1" width="6" height="6" rx="1"/><rect x="1" y="9" width="6" height="6" rx="1"/><rect x="9" y="9" width="6" height="6" rx="1"/></svg>
+                        <span className="hidden sm:inline">Kartu</span>
+                    </button>
+                    <button onClick={() => setViewMode('table')}
+                        className={`px-3 py-1.5 text-xs font-semibold transition-colors flex items-center gap-1 ${viewMode === 'table' ? 'bg-brand-accent text-white' : 'bg-brand-surface text-brand-text-secondary hover:bg-brand-bg'}`}
+                        title="Tampilan Tabel">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="1"/><line x1="1" y1="5" x2="15" y2="5"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="1" y1="13" x2="15" y2="13"/><line x1="5" y1="1" x2="5" y2="15"/></svg>
+                        <span className="hidden sm:inline">Tabel</span>
+                    </button>
+                </div>
+            </div>
 
-                <aside className="lg:col-span-1 space-y-6 lg:sticky lg:top-24">
-                    <div className="glass-card rounded-3xl border border-brand-border/50 flex flex-col shadow-sm">
-                        <div className="p-4 md:p-5 border-b border-brand-border/50 bg-brand-surface/60 rounded-t-3xl backdrop-blur-md">
-                            <h3 className="font-bold text-lg text-gradient flex items-center gap-2">
-                                <PlusIcon className="w-5 h-5 text-brand-accent" /> Layanan Tambahan
-                            </h3>
-                            <p className="text-xs text-brand-text-secondary mt-1">Kelola ekstra Add-Ons.</p>
-                        </div>
+            {/* ── Main content ─────────────────────────────────────────────── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
 
-                        <div className="p-2 md:p-3 space-y-1.5 max-h-[40vh] overflow-y-auto custom-scrollbar bg-brand-surface/20">
-                            {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).map(addon => (
-                                <div key={addon.id} className="group flex justify-between items-center bg-white/60 hover:bg-white border border-brand-border/30 p-3 rounded-xl transition-all shadow-sm">
-                                    <div className="flex flex-col min-w-0 pr-2">
-                                        <span className="text-sm font-semibold text-brand-text-light truncate">{addon.name}</span>
-                                        <span className="text-xs font-bold text-brand-accent mt-0.5">{formatCurrency(addon.price)}</span>
+                {/* ── Left: packages (cards OR table) ── */}
+                <div className="lg:col-span-2 space-y-6">
+
+                    {viewMode === 'cards' && (
+                        <>
+                            {(Object.entries(packagesByCategory) as [string, Package[]][]).length === 0 && (
+                                <div className="text-center py-20 bg-brand-surface rounded-2xl border border-brand-border">
+                                    <PackageIcon className="mx-auto w-12 h-12 text-brand-text-secondary opacity-30 mb-3" />
+                                    <p className="text-brand-text-secondary text-sm">Belum ada package untuk wilayah ini.</p>
+                                    <button onClick={() => setPackageEditMode('new')} className="mt-4 button-primary text-sm inline-flex items-center gap-2">
+                                        <PlusIcon className="w-4 h-4" /> Tambah Package Pertama
+                                    </button>
+                                </div>
+                            )}
+                            {(Object.entries(packagesByCategory) as [string, Package[]][]).map(([category, pkgs]) => (
+                                <div key={category}>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <h3 className="text-base font-bold text-brand-text-light">{category}</h3>
+                                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20">{pkgs.length}</span>
                                     </div>
-                                    <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-                                        <button onClick={() => handleAddOnEdit(addon)} className="p-2 rounded-lg text-brand-text-secondary hover:bg-amber-50 hover:text-amber-600 transition-colors" title="Edit Add-On" aria-label={`Edit Add-On ${addon.name}`}><PencilIcon className="w-4 h-4" /></button>
-                                        <button onClick={() => handleAddOnDelete(addon.id)} className="p-2 rounded-lg text-brand-text-secondary hover:bg-red-50 hover:text-red-600 transition-colors" title="Hapus Add-On" aria-label={`Hapus Add-On ${addon.name}`}><Trash2Icon className="w-4 h-4" /></button>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {pkgs.map(pkg => (
+                                            <div key={pkg.id} className="bg-brand-surface rounded-2xl flex flex-col overflow-hidden border border-brand-border shadow-sm hover:shadow-md hover:border-brand-accent/30 transition-all group">
+                                                {pkg.coverImage ? (
+                                                    <div className="h-36 overflow-hidden relative">
+                                                        <img src={pkg.coverImage} alt={pkg.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
+                                                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/40 to-transparent" />
+                                                        {pkg.region && (
+                                                            <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-black/50 text-white backdrop-blur-sm">
+                                                                {pkg.region}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                ) : (
+                                                    <div className="h-28 bg-brand-bg flex items-center justify-center relative">
+                                                        <CameraIcon className="w-8 h-8 text-brand-text-secondary opacity-30" />
+                                                        {pkg.region && (
+                                                            <span className="absolute top-2 right-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-accent/10 text-brand-accent border border-brand-accent/20">
+                                                                {pkg.region}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                                <div className="p-4 flex-grow flex flex-col gap-3">
+                                                    <div>
+                                                        <h4 className="font-bold text-sm text-brand-text-light leading-tight">{pkg.name}</h4>
+                                                        {pkg.photographers && <p className="text-xs text-brand-text-secondary mt-0.5">Tim: {pkg.photographers}</p>}
+                                                    </div>
+                                                    {/* Price block */}
+                                                    <div className="bg-brand-bg rounded-xl p-3 border border-brand-border/50">
+                                                        {pkg.durationOptions && pkg.durationOptions.length > 0 ? (
+                                                            <div className="space-y-1">
+                                                                {pkg.durationOptions.map((o, i) => (
+                                                                    <div key={i} className="flex justify-between items-center text-xs">
+                                                                        <span className="text-brand-text-secondary truncate pr-2">{o.label}</span>
+                                                                        <span className="font-bold text-brand-accent flex-shrink-0">{formatCurrency(o.price)}</span>
+                                                                    </div>
+                                                                ))}
+                                                            </div>
+                                                        ) : (
+                                                            <p className="text-lg font-bold text-brand-accent">{formatCurrency(pkg.price)}</p>
+                                                        )}
+                                                    </div>
+                                                    {/* Digital items / description */}
+                                                    {pkg.digitalItems.length > 0 && (
+                                                        <ul className="space-y-0.5">
+                                                            {pkg.digitalItems.slice(0, 4).map((item, i) => (
+                                                                <li key={i} className="text-xs text-brand-text-primary flex items-start gap-1.5">
+                                                                    <span className="w-1 h-1 rounded-full bg-brand-accent/50 mt-1.5 flex-shrink-0" />
+                                                                    <span className="line-clamp-1">{item}</span>
+                                                                </li>
+                                                            ))}
+                                                            {pkg.digitalItems.length > 4 && (
+                                                                <li className="text-xs text-brand-text-secondary pl-2.5">+{pkg.digitalItems.length - 4} lainnya</li>
+                                                            )}
+                                                        </ul>
+                                                    )}
+                                                    {/* Physical items */}
+                                                    {pkg.physicalItems.length > 0 && (
+                                                        <div className="flex flex-wrap gap-1">
+                                                            {pkg.physicalItems.map((item, i) => (
+                                                                <span key={i} className="text-[10px] px-2 py-0.5 rounded-full bg-brand-bg border border-brand-border text-brand-text-secondary">{item.name}</span>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                    {/* Actions */}
+                                                    <div className="flex gap-2 pt-2 border-t border-brand-border/50 mt-auto">
+                                                        <button onClick={() => handlePackageEdit(pkg)} className="button-secondary flex-1 text-xs py-1.5 gap-1">
+                                                            <PencilIcon className="w-3.5 h-3.5" /> Edit
+                                                        </button>
+                                                        <button onClick={() => handleOpenCopyModal(pkg)} className="button-secondary !p-2 text-brand-text-secondary hover:text-brand-accent" title="Duplikasi">
+                                                            <CopyIcon className="w-3.5 h-3.5" />
+                                                        </button>
+                                                        <button onClick={() => handlePackageDelete(pkg.id)} className="button-secondary !p-2 text-brand-text-secondary hover:text-red-600" title="Hapus">
+                                                            <Trash2Icon className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             ))}
-                            {(!regionFilter ? addOns : addOns.filter(a => a.region === regionFilter)).length === 0 && (
-                                <div className="text-center py-8 text-brand-text-secondary/50 text-sm">
-                                    Belum ada add-on untuk wilayah ini.
-                                </div>
-                            )}
-                        </div>
+                        </>
+                    )}
 
-                        <form onSubmit={handleAddOnSubmit} className="p-4 md:p-5 border-t border-brand-border/50 bg-brand-surface/40 rounded-b-3xl space-y-4">
-                            <h4 className="text-xs font-bold uppercase tracking-wider text-brand-text-secondary/70 mb-2">{addOnEditMode ? 'Edit Add-On' : 'Tambah Add-On Baru'}</h4>
-                            <div className="input-group">
-                                <input type="text" id="addOnName" name="name" value={addOnFormData.name} onChange={handleAddOnInputChange} className="input-field bg-white/80" placeholder=" " required />
-                                <label htmlFor="addOnName" className="input-label">Nama Add-On</label>
+                    {viewMode === 'table' && (
+                        <div className="bg-brand-surface rounded-2xl border border-brand-border shadow-sm overflow-hidden">
+                            {/* Table header bar */}
+                            <div className="px-4 py-3 border-b border-brand-border flex items-center justify-between gap-2">
+                                <p className="text-sm font-semibold text-brand-text-light">
+                                    {(regionFilter ? packages.filter(p => (p.region ? p.region.toLowerCase() === regionFilter.toLowerCase() : false)) : packages).length} Package
+                                </p>
+                                <button onClick={() => setPackageEditMode('new')} className="btn-box-add text-xs px-3 py-1.5 inline-flex items-center gap-1">
+                                    <PlusIcon className="w-3.5 h-3.5" /> Tambah
+                                </button>
                             </div>
-                            <div className="input-group">
-                                <RupiahInput id="addOnPrice" value={addOnFormData.price.toString()} onChange={(raw) => setAddOnFormData(prev => ({ ...prev, price: raw }))} className="input-field bg-white/80" placeholder=" " required />
-                                <label htmlFor="addOnPrice" className="input-label">Harga (IDR)</label>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm !border-0">
+                                    <thead>
+                                        <tr className="bg-brand-bg text-left">
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border w-8">#</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border">Nama Package</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden sm:table-cell">Kategori</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden md:table-cell">Wilayah</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border">Harga</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden lg:table-cell">Tim</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden xl:table-cell">Deskripsi</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(Object.entries(packagesByCategory) as [string, Package[]][]).flatMap(([cat, pkgs]) =>
+                                            pkgs.map((pkg, idx) => (
+                                                <tr key={pkg.id} className="border-t border-brand-border/40 hover:bg-brand-bg/60 transition-colors">
+                                                    <td className="px-4 py-3 text-brand-text-secondary text-xs !border-0">{idx + 1}</td>
+                                                    <td className="px-4 py-3 !border-0">
+                                                        <div className="flex items-center gap-2.5">
+                                                            {pkg.coverImage ? (
+                                                                <img src={pkg.coverImage} alt="" className="w-9 h-9 rounded-lg object-cover flex-shrink-0 border border-brand-border" />
+                                                            ) : (
+                                                                <div className="w-9 h-9 rounded-lg bg-brand-bg border border-brand-border flex items-center justify-center flex-shrink-0">
+                                                                    <CameraIcon className="w-4 h-4 text-brand-text-secondary opacity-40" />
+                                                                </div>
+                                                            )}
+                                                            <div className="min-w-0">
+                                                                <p className="font-semibold text-brand-text-light text-sm leading-tight truncate max-w-[180px]">{pkg.name}</p>
+                                                                <p className="text-xs text-brand-text-secondary sm:hidden">{cat}</p>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-3 hidden sm:table-cell !border-0">
+                                                        <span className="text-xs px-2 py-0.5 rounded-full bg-purple-500/10 text-purple-700 border border-purple-400/20 font-medium">{cat}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 hidden md:table-cell !border-0">
+                                                        {pkg.region ? (
+                                                            <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 border border-blue-400/20 font-medium">{pkg.region}</span>
+                                                        ) : <span className="text-brand-text-secondary text-xs">—</span>}
+                                                    </td>
+                                                    <td className="px-4 py-3 !border-0">
+                                                        {pkg.durationOptions && pkg.durationOptions.length > 0 ? (
+                                                            <div className="space-y-0.5">
+                                                                {pkg.durationOptions.slice(0, 2).map((o, i) => (
+                                                                    <div key={i} className="text-xs flex items-center gap-1">
+                                                                        <span className="text-brand-text-secondary truncate max-w-[60px]">{o.label}</span>
+                                                                        <span className="font-bold text-brand-accent">{formatCurrency(o.price)}</span>
+                                                                    </div>
+                                                                ))}
+                                                                {pkg.durationOptions.length > 2 && <p className="text-[10px] text-brand-text-secondary">+{pkg.durationOptions.length - 2} opsi</p>}
+                                                            </div>
+                                                        ) : (
+                                                            <span className="font-bold text-brand-accent text-sm">{formatCurrency(pkg.price)}</span>
+                                                        )}
+                                                    </td>
+                                                    <td className="px-4 py-3 hidden lg:table-cell !border-0">
+                                                        <span className="text-xs text-brand-text-primary">{pkg.photographers || '—'}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 hidden xl:table-cell !border-0">
+                                                        {pkg.digitalItems.length > 0 ? (
+                                                            <p className="text-xs text-brand-text-secondary line-clamp-2 max-w-[200px]">{pkg.digitalItems.join(' • ')}</p>
+                                                        ) : <span className="text-brand-text-secondary text-xs">—</span>}
+                                                    </td>
+                                                    <td className="px-4 py-3 !border-0">
+                                                        <div className="flex items-center justify-end gap-1.5">
+                                                            <button onClick={() => handlePackageEdit(pkg)} className="btn-box-edit w-7 h-7 rounded-md" title="Edit">
+                                                                <PencilIcon className="w-3.5 h-3.5" />
+                                                            </button>
+                                                            <button onClick={() => handleOpenCopyModal(pkg)} className="button-secondary !p-1.5 text-brand-text-secondary hover:text-brand-accent rounded-md" title="Duplikasi">
+                                                                <CopyIcon className="w-3.5 h-3.5" />
+                                                            </button>
+                                                            <button onClick={() => handlePackageDelete(pkg.id)} className="btn-box-delete w-7 h-7 rounded-md" title="Hapus">
+                                                                <Trash2Icon className="w-3.5 h-3.5 text-white" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        )}
+                                        {(Object.entries(packagesByCategory).length === 0) && (
+                                            <tr>
+                                                <td colSpan={8} className="px-4 py-12 text-center text-brand-text-secondary !border-0">
+                                                    <PackageIcon className="mx-auto w-8 h-8 mb-2 opacity-30" />
+                                                    <p className="text-sm">Belum ada package.</p>
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div className="input-group">
-                                <input
-                                    type="text"
-                                    id="addOnRegion"
-                                    name="region"
-                                    list="region-suggestions"
-                                    value={addOnFormData.region}
-                                    onChange={handleAddOnInputChange}
-                                    className="input-field bg-white/80"
-                                    placeholder=" "
-                                />
-                                <label htmlFor="addOnRegion" className="input-label">Wilayah (opsional)</label>
+                            {/* Add-ons table */}
+                            <div className="border-t border-brand-border">
+                                <div className="px-4 py-3 bg-brand-bg flex items-center justify-between">
+                                    <p className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider">Add-On Layanan</p>
+                                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 border border-blue-400/20">
+                                        {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).length} item
+                                    </span>
+                                </div>
+                                <table className="w-full text-sm !border-0">
+                                    <thead>
+                                        <tr className="bg-brand-bg/50">
+                                            <th className="px-4 py-2 text-xs font-bold text-brand-text-secondary text-left !border-0 border-b border-brand-border/50">Nama</th>
+                                            <th className="px-4 py-2 text-xs font-bold text-brand-text-secondary !border-0 border-b border-brand-border/50 hidden sm:table-cell">Wilayah</th>
+                                            <th className="px-4 py-2 text-xs font-bold text-brand-text-secondary text-right !border-0 border-b border-brand-border/50">Harga</th>
+                                            <th className="px-4 py-2 text-xs font-bold text-brand-text-secondary text-right !border-0 border-b border-brand-border/50">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).map(addon => (
+                                            <tr key={addon.id} className="border-t border-brand-border/30 hover:bg-brand-bg/40 transition-colors">
+                                                <td className="px-4 py-2.5 font-semibold text-brand-text-light text-sm !border-0">{addon.name}</td>
+                                                <td className="px-4 py-2.5 hidden sm:table-cell !border-0">
+                                                    {addon.region ? <span className="text-xs px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 border border-blue-400/20">{addon.region}</span> : <span className="text-xs text-brand-text-secondary">—</span>}
+                                                </td>
+                                                <td className="px-4 py-2.5 text-right font-bold text-brand-accent !border-0">{formatCurrency(addon.price)}</td>
+                                                <td className="px-4 py-2.5 text-right !border-0">
+                                                    <div className="flex items-center justify-end gap-1.5">
+                                                        <button onClick={() => handleAddOnEdit(addon)} className="btn-box-edit w-7 h-7 rounded-md" title="Edit"><PencilIcon className="w-3.5 h-3.5" /></button>
+                                                        <button onClick={() => handleAddOnDelete(addon.id)} className="btn-box-delete w-7 h-7 rounded-md" title="Hapus"><Trash2Icon className="w-3.5 h-3.5 text-white" /></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                        {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).length === 0 && (
+                                            <tr><td colSpan={4} className="px-4 py-6 text-center text-xs text-brand-text-secondary !border-0">Belum ada add-on.</td></tr>
+                                        )}
+                                    </tbody>
+                                </table>
                             </div>
-                            <div className="flex flex-wrap gap-1.5 pt-1">
-                                {unionRegions.map(r => (
-                                    <button type="button" key={r.value} onClick={() => setAddOnFormData(prev => ({ ...prev, region: r.value }))} className={`px-2.5 py-1 rounded-full text-[10px] font-semibold transition-colors border ${addOnFormData.region === r.value ? 'bg-brand-accent text-white border-brand-accent shadow-sm' : 'bg-white border-brand-border border-dashed text-brand-text-secondary hover:border-brand-accent/50'}`}>{r.label}</button>
+                        </div>
+                    )}
+                </div>
+
+                {/* ── Right sidebar: Add-On panel (only in card view) ── */}
+                {viewMode === 'cards' && (
+                    <aside className="lg:col-span-1 space-y-4 lg:sticky lg:top-24">
+                        <div className="bg-brand-surface rounded-2xl border border-brand-border shadow-sm overflow-hidden">
+                            <div className="px-4 py-3 border-b border-brand-border flex items-center justify-between bg-brand-bg/50">
+                                <div>
+                                    <h3 className="font-bold text-sm text-brand-text-light">Layanan Tambahan</h3>
+                                    <p className="text-xs text-brand-text-secondary mt-0.5">Add-On yang tersedia</p>
+                                </div>
+                                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-700 border border-blue-400/20">
+                                    {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).length}
+                                </span>
+                            </div>
+                            <div className="divide-y divide-brand-border/40 max-h-64 overflow-y-auto">
+                                {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).map(addon => (
+                                    <div key={addon.id} className="group flex justify-between items-center px-4 py-2.5 hover:bg-brand-bg/50 transition-colors">
+                                        <div className="min-w-0 pr-2">
+                                            <p className="text-sm font-semibold text-brand-text-light truncate">{addon.name}</p>
+                                            <p className="text-xs font-bold text-brand-accent">{formatCurrency(addon.price)}</p>
+                                        </div>
+                                        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                                            <button onClick={() => handleAddOnEdit(addon)} className="p-1.5 rounded-lg hover:bg-amber-50 hover:text-amber-600 text-brand-text-secondary transition-colors" title="Edit"><PencilIcon className="w-3.5 h-3.5" /></button>
+                                            <button onClick={() => handleAddOnDelete(addon.id)} className="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-600 text-brand-text-secondary transition-colors" title="Hapus"><Trash2Icon className="w-3.5 h-3.5" /></button>
+                                        </div>
+                                    </div>
                                 ))}
-                                {addOnFormData.region && (
-                                    <button type="button" onClick={() => setAddOnFormData(prev => ({ ...prev, region: '' }))} className="px-2.5 py-1 rounded-full text-[10px] font-semibold border bg-red-50 border-red-200 text-brand-danger">Kosongkan</button>
+                                {(regionFilter ? addOns.filter(a => a.region === regionFilter) : addOns).length === 0 && (
+                                    <p className="text-center py-8 text-xs text-brand-text-secondary">Belum ada add-on.</p>
                                 )}
                             </div>
-                            <div className="flex gap-2 pt-2">
-                                {addOnEditMode && <button type="button" onClick={handleAddOnCancelEdit} className="button-secondary flex-1 py-2 text-xs">Batal</button>}
-                                <button type="submit" className="button-primary flex-[2] py-2 text-xs shadow-md">{addOnEditMode ? 'Simpan' : 'Tambah'}</button>
-                            </div>
-                        </form>
-                    </div>
-                </aside>
+
+                            {/* Add-on form */}
+                            <form onSubmit={handleAddOnSubmit} className="px-4 py-4 border-t border-brand-border space-y-3 bg-brand-bg/30">
+                                <p className="text-xs font-bold text-brand-text-secondary uppercase tracking-wider">{addOnEditMode ? 'Edit Add-On' : 'Tambah Add-On'}</p>
+                                <div className="input-group !mt-0">
+                                    <input type="text" id="addOnName" name="name" value={addOnFormData.name} onChange={handleAddOnInputChange} className="input-field" placeholder=" " required />
+                                    <label htmlFor="addOnName" className="input-label">Nama</label>
+                                </div>
+                                <div className="input-group !mt-0">
+                                    <RupiahInput id="addOnPrice" value={addOnFormData.price.toString()} onChange={(raw) => setAddOnFormData(prev => ({ ...prev, price: raw }))} className="input-field" placeholder=" " required />
+                                    <label htmlFor="addOnPrice" className="input-label">Harga (IDR)</label>
+                                </div>
+                                <div className="input-group !mt-0">
+                                    <input type="text" id="addOnRegion" name="region" list="region-suggestions" value={addOnFormData.region} onChange={handleAddOnInputChange} className="input-field" placeholder=" " />
+                                    <label htmlFor="addOnRegion" className="input-label">Wilayah (opsional)</label>
+                                </div>
+                                <div className="flex flex-wrap gap-1">
+                                    {unionRegions.map(r => (
+                                        <button type="button" key={r.value} onClick={() => setAddOnFormData(prev => ({ ...prev, region: r.value }))}
+                                            className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border transition-colors ${addOnFormData.region === r.value ? 'bg-brand-accent text-white border-brand-accent' : 'bg-brand-surface border-brand-border text-brand-text-secondary hover:border-brand-accent/50'}`}>
+                                            {r.label}
+                                        </button>
+                                    ))}
+                                    {addOnFormData.region && (
+                                        <button type="button" onClick={() => setAddOnFormData(prev => ({ ...prev, region: '' }))} className="px-2 py-0.5 rounded-full text-[10px] font-semibold border bg-red-50 border-red-200 text-brand-danger">Hapus</button>
+                                    )}
+                                </div>
+                                <div className="flex gap-2">
+                                    {addOnEditMode && <button type="button" onClick={handleAddOnCancelEdit} className="button-secondary flex-1 py-1.5 text-xs">Batal</button>}
+                                    <button type="submit" className="button-primary flex-[2] py-1.5 text-xs">{addOnEditMode ? 'Simpan' : 'Tambah'}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </aside>
+                )}
             </div>
 
             <Modal isOpen={packageEditMode !== null} onClose={handlePackageCancelEdit} title={packageEditMode === 'new' ? 'Tambah Package Baru' : 'Edit Package'} size="3xl">

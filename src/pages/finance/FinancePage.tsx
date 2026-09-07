@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
     Transaction,
     TransactionType,
@@ -9,15 +9,16 @@ import {
     TeamMember
 } from '../../types';
 
-import {
-    PlusIcon,
-    FileTextIcon,
-    ClipboardListIcon,
-    CreditCardIcon,
-    TrendingUpIcon,
-    BarChart2Icon,
-    DollarSignIcon
-} from '../../constants';
+import { PlusIcon } from '../../constants';
+
+const InfoIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="16" x2="12" y2="12" />
+        <line x1="12" y1="8" x2="12.01" y2="8" />
+    </svg>
+);
 
 import { FinanceHeaderStats } from '../../features/finance/components/FinanceHeaderStats';
 import { FinanceTabs } from '../../features/finance/components/FinanceTabs';
@@ -32,6 +33,8 @@ import FinanceFormModal from '../../features/finance/components/FinanceFormModal
 import FinanceHistoryModal from '../../features/finance/components/FinanceHistoryModal';
 import FinanceStatDetailModal from '../../features/finance/components/FinanceStatDetailModal';
 import FinanceGuideModal from '../../features/finance/components/FinanceGuideModal';
+import InteractiveCashflowChart from '../../shared/ui/InteractiveCashflowChart';
+import DonutChart from '../../shared/ui/DonutChart';
 
 import { useFinance } from '../../features/finance/hooks/useFinance';
 import { useFinanceCalculations } from '../../features/finance/hooks/useFinanceCalculations';
@@ -68,6 +71,16 @@ export type FinanceTabType =
     | 'laporanKartu'
     | 'labaAcara Pernikahan';
 
+// ── Small inline icon so we don't need to import a wallet icon ─────────────
+const WalletIcon = (props: React.SVGProps<SVGSVGElement>) => (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+        stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M20 12V8a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4z" />
+        <path d="M12 2v4M6 2v4" />
+        <circle cx="17" cy="12" r="1" fill="currentColor" />
+    </svg>
+);
+
 const Finance: React.FC<FinanceProps> = ({
     transactions,
     setTransactions,
@@ -79,9 +92,7 @@ const Finance: React.FC<FinanceProps> = ({
     cards,
     setCards
 }) => {
-    const showNotification = (_message: string) => {
-        // Notification placeholder to align with app state pattern
-    };
+    const showNotification = (_message: string) => {};
 
     const { handleDelete, handleAddTransaction, handleUpdateTransaction } = useFinance(
         transactions,
@@ -93,7 +104,7 @@ const Finance: React.FC<FinanceProps> = ({
         showNotification
     );
 
-    // Navigation & Modal State
+    // ── Navigation & Modal State ─────────────────────────────────────────────
     const [activeTab, setActiveTab] = useState<FinanceTabType>('transactions');
     const [showVisualSummary, setShowVisualSummary] = useState(false);
     const [historyModalState, setHistoryModalState] = useState<{
@@ -103,7 +114,7 @@ const Finance: React.FC<FinanceProps> = ({
     const [activeStatModal, setActiveStatModal] = useState<'assets' | 'pockets' | 'income' | 'expense' | null>(null);
     const [isInfoModalOpen, setIsInfoModalOpen] = useState(false);
 
-    // Filters
+    // ── Filters ──────────────────────────────────────────────────────────────
     const [filters, setFilters] = useState({ searchTerm: '', dateFrom: '', dateTo: '' });
     const [categoryFilter, setCategoryFilter] = useState<{ type: TransactionType | 'all'; category: string }>({
         type: 'all',
@@ -116,11 +127,10 @@ const Finance: React.FC<FinanceProps> = ({
     });
     const [transactionProjectMonthFilter, setTransactionProjectMonthFilter] = useState<string>(() => {
         const now = new Date();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        return `${now.getFullYear()}-${month}`;
+        return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     });
 
-    // Calculations
+    // ── Calculations ─────────────────────────────────────────────────────────
     const {
         cashflowChartData,
         cashflowMetrics,
@@ -149,7 +159,7 @@ const Finance: React.FC<FinanceProps> = ({
         profitReportFilters
     });
 
-    // Business Operations & Forms
+    // ── Business Operations ───────────────────────────────────────────────────
     const {
         modalState,
         isSubmitting,
@@ -180,18 +190,15 @@ const Finance: React.FC<FinanceProps> = ({
         setFilters
     });
 
-    const handleDownloadReportCSVClick = () => {
+    // ── CSV / Print handlers ──────────────────────────────────────────────────
+    const handleDownloadReportCSVClick = () =>
         downloadReportCSV(reportTransactions, reportFilters, reportClientOptions);
-    };
-
-    const handleDownloadTransactionsCSVClick = () => {
+    const handleDownloadTransactionsCSVClick = () =>
         downloadTransactionsCSV(filteredTransactions, transactions, filteredSummary);
-    };
-
-    const handleDownloadProfitReportCSVClick = () => {
+    const handleDownloadProfitReportCSVClick = () =>
         downloadProfitReportCSV(projectProfitabilityData, profitReportFilters);
-    };
 
+    // ── Tab content ───────────────────────────────────────────────────────────
     const renderTabContent = () => {
         switch (activeTab) {
             case 'transactions':
@@ -278,20 +285,61 @@ const Finance: React.FC<FinanceProps> = ({
         }
     };
 
+    // ── All-time totals for header stat cards ────────────────────────────────
+    const allTimeTotals = useMemo(() => {
+        const income = transactions
+            .filter(t => t.type === TransactionType.INCOME)
+            .reduce((sum, t) => sum + t.amount, 0);
+        const expense = transactions
+            .filter(t => t.type === TransactionType.EXPENSE)
+            .reduce((sum, t) => sum + t.amount, 0);
+        return { income, expense };
+    }, [transactions]);
+
+    // ── Derived values for summary panel ─────────────────────────────────────
+    const netThisMonth = summary.totalIncomeThisMonth - summary.totalExpenseThisMonth;
+
     return (
-        <div className="space-y-6">
-            <div className="flex justify-end items-center gap-2 non-printable">
-                <button
-                    onClick={() => handleOpenModal('transaction', 'add')}
-                    className="btn-box-add inline-flex items-center gap-2 text-sm px-3.5 py-2 font-semibold"
-                >
-                    <PlusIcon className="w-4 h-4 flex-shrink-0" />
-                    Tambah Transaksi
-                </button>
+        <div className="space-y-5">
+
+            {/* ── Page header bar ──────────────────────────────────────────── */}
+            <div className="flex items-center justify-between gap-3 non-printable">
+                <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-400/30
+                                    flex items-center justify-center flex-shrink-0">
+                        <WalletIcon className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div>
+                        <h1 className="text-lg font-bold text-brand-text-light leading-tight">Keuangan</h1>
+                        <p className="text-xs text-brand-text-secondary leading-tight hidden sm:block">
+                            {transactions.length} transaksi &middot; {cards.length} kartu &middot; {pockets.length} kantong
+                        </p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsInfoModalOpen(true)}
+                        className="button-secondary min-h-[36px] px-3 py-1.5 text-xs gap-1.5 hidden sm:inline-flex"
+                        title="Panduan Keuangan"
+                    >
+                        <InfoIcon className="w-4 h-4 flex-shrink-0" />
+                        <span>Panduan</span>
+                    </button>
+                    <button
+                        onClick={() => handleOpenModal('transaction', 'add')}
+                        className="btn-box-add inline-flex items-center gap-1.5 text-sm px-3.5 py-2 font-semibold"
+                    >
+                        <PlusIcon className="w-4 h-4 flex-shrink-0" />
+                        <span className="hidden sm:inline">Tambah Transaksi</span>
+                        <span className="sm:hidden">+ Transaksi</span>
+                    </button>
+                </div>
             </div>
 
-            <FinanceHeaderStats summary={summary} setActiveStatModal={setActiveStatModal} />
+            {/* ── Stat cards ───────────────────────────────────────────────── */}
+            <FinanceHeaderStats summary={summary} allTimeTotals={allTimeTotals} setActiveStatModal={setActiveStatModal} />
 
+            {/* ── Tab bar (shared desktop + mobile) ────────────────────────── */}
             <FinanceTabs
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
@@ -299,106 +347,112 @@ const Finance: React.FC<FinanceProps> = ({
                 setShowVisualSummary={setShowVisualSummary}
             />
 
-            {/* Optional Collapsible Visual Summary */}
+            {/* ── Visual summary panel (real content, collapsible) ─────────── */}
             {showVisualSummary && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 p-4 rounded-2xl bg-brand-bg/60 border border-brand-border mb-6 animate-fade-in">
-                    <p className="text-sm text-brand-text-secondary italic">
-                        Ringkasan visual dan grafik akan muncul di sini.
-                    </p>
+                <div className="rounded-2xl border border-brand-border bg-brand-surface shadow-sm overflow-hidden animate-fade-in non-printable">
+                    {/* Panel header */}
+                    <div className="px-5 py-3.5 border-b border-brand-border flex items-center justify-between">
+                        <h3 className="font-semibold text-brand-text-light text-sm flex items-center gap-2">
+                            <svg className="w-4 h-4 text-brand-accent" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Ringkasan Visual
+                        </h3>
+                        {/* Quick KPI strip */}
+                        <div className="hidden sm:flex items-center gap-4 text-xs">
+                            <span className="text-brand-text-secondary">Bulan ini:</span>
+                            <span className="font-semibold text-brand-success">
+                                +{new Intl.NumberFormat('id-ID', { notation: 'compact', currency: 'IDR', style: 'currency', minimumFractionDigits: 0 }).format(summary.totalIncomeThisMonth)}
+                            </span>
+                            <span className="font-semibold text-brand-danger">
+                                -{new Intl.NumberFormat('id-ID', { notation: 'compact', currency: 'IDR', style: 'currency', minimumFractionDigits: 0 }).format(summary.totalExpenseThisMonth)}
+                            </span>
+                            <span className={`font-bold ${netThisMonth >= 0 ? 'text-brand-success' : 'text-brand-danger'}`}>
+                                Net: {new Intl.NumberFormat('id-ID', { notation: 'compact', currency: 'IDR', style: 'currency', minimumFractionDigits: 0 }).format(netThisMonth)}
+                            </span>
+                        </div>
+                    </div>
+
+                    {/* Chart grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-0 divide-y lg:divide-y-0 lg:divide-x divide-brand-border">
+                        {/* Cashflow bar+line chart — takes 2/3 */}
+                        <div className="lg:col-span-2 p-4 md:p-5">
+                            <h4 className="text-xs font-semibold text-brand-text-secondary uppercase tracking-wider mb-3">
+                                Arus Kas Bulanan
+                            </h4>
+                            <InteractiveCashflowChart data={cashflowChartData} />
+                            {/* Legend */}
+                            <div className="flex items-center gap-4 mt-3 text-xs text-brand-text-secondary">
+                                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#34D399]"></span>Pemasukan</span>
+                                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-[#FB5D5D]"></span>Pengeluaran</span>
+                                <span className="flex items-center gap-1.5"><span className="w-2.5 h-1 rounded-full bg-[#FFF27A]"></span>Saldo</span>
+                            </div>
+                        </div>
+
+                        {/* Expense donut — takes 1/3 */}
+                        <div className="p-4 md:p-5">
+                            <h4 className="text-xs font-semibold text-brand-text-secondary uppercase tracking-wider mb-3">
+                                Pengeluaran per Kategori
+                            </h4>
+                            <DonutChart data={expenseDonutData} showValues />
+                        </div>
+                    </div>
+
+                    {/* Monthly cashflow mini-table */}
+                    {cashflowChartData.length > 0 && (
+                        <div className="border-t border-brand-border">
+                            <div className="px-5 py-3 flex items-center justify-between">
+                                <p className="text-xs font-semibold text-brand-text-secondary uppercase tracking-wider">
+                                    Data Bulanan
+                                </p>
+                                <p className="text-xs text-brand-text-secondary">{cashflowChartData.length} bulan</p>
+                            </div>
+                            <div className="overflow-x-auto max-h-48">
+                                <table className="w-full text-xs !border-0">
+                                    <thead>
+                                        <tr className="bg-brand-bg text-brand-text-secondary">
+                                            <th className="px-4 py-2 text-left font-semibold !border-0 border-b border-brand-border">Periode</th>
+                                            <th className="px-4 py-2 text-right font-semibold !border-0 border-b border-brand-border">Masuk</th>
+                                            <th className="px-4 py-2 text-right font-semibold !border-0 border-b border-brand-border">Keluar</th>
+                                            <th className="px-4 py-2 text-right font-semibold !border-0 border-b border-brand-border">Net</th>
+                                            <th className="px-4 py-2 text-right font-semibold !border-0 border-b border-brand-border">Saldo</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {[...cashflowChartData].reverse().map((d) => {
+                                            const net = d.income - d.expense;
+                                            const fmt = (n: number) =>
+                                                new Intl.NumberFormat('id-ID', {
+                                                    notation: 'compact', style: 'currency',
+                                                    currency: 'IDR', minimumFractionDigits: 0
+                                                }).format(n);
+                                            return (
+                                                <tr key={d.label} className="border-t border-brand-border/40 hover:bg-brand-bg/60 transition-colors">
+                                                    <td className="px-4 py-2 font-semibold text-brand-text-light !border-0">{d.label}</td>
+                                                    <td className="px-4 py-2 text-right text-brand-success !border-0">{fmt(d.income)}</td>
+                                                    <td className="px-4 py-2 text-right text-brand-danger !border-0">{fmt(d.expense)}</td>
+                                                    <td className={`px-4 py-2 text-right font-bold !border-0 ${net >= 0 ? 'text-brand-success' : 'text-brand-danger'}`}>
+                                                        {net >= 0 ? '+' : ''}{fmt(net)}
+                                                    </td>
+                                                    <td className="px-4 py-2 text-right text-brand-text-light !border-0">{fmt(d.balance)}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* Mobile Tab Navigation - Horizontal Scrollable Navigation */}
-            <div className="md:hidden non-printable widget-animate mb-4" style={{ animationDelay: '500ms' }}>
-                <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-                    <button
-                        onClick={() => setActiveTab('transactions')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'transactions'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <FileTextIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Transaksi</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('pockets')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'pockets'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <ClipboardListIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Kantong</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('cards')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'cards'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <CreditCardIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Kartu</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('cashflow')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'cashflow'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <TrendingUpIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Arus Kas</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('laporan')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'laporan'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <BarChart2Icon className="w-4 h-4 flex-shrink-0" />
-                        <span>Laporan</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('laporanKartu')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'laporanKartu'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <CreditCardIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Lap. Kartu</span>
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('labaAcara Pernikahan')}
-                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 font-semibold text-xs sm:text-sm min-h-[38px] transition-all duration-300 border-b-2 ${
-                            activeTab === 'labaAcara Pernikahan'
-                                ? 'border-blue-600 text-blue-600'
-                                : 'border-transparent text-brand-text-secondary hover:text-blue-600'
-                        }`}
-                    >
-                        <DollarSignIcon className="w-4 h-4 flex-shrink-0" />
-                        <span>Laba</span>
-                    </button>
-                </div>
-            </div>
-
-            <div className="widget-animate" style={{ animationDelay: '600ms' }}>
+            {/* ── Tab content ──────────────────────────────────────────────── */}
+            <div className="widget-animate">
                 {renderTabContent()}
             </div>
 
-            <FinanceGuideModal
-                isOpen={isInfoModalOpen}
-                onClose={() => setIsInfoModalOpen(false)}
-            />
+            {/* ── Modals ───────────────────────────────────────────────────── */}
+            <FinanceGuideModal isOpen={isInfoModalOpen} onClose={() => setIsInfoModalOpen(false)} />
 
             <FinanceFormModal
                 modalState={modalState}

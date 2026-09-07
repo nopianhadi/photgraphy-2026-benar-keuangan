@@ -25,7 +25,7 @@ interface UseFinanceOperationsParams {
     projects: Project[];
     setProjects: React.Dispatch<React.SetStateAction<Project[]>>;
     handleAddTransaction: (tx: Omit<Transaction, 'id' | 'vendorSignature'>) => Promise<Transaction>;
-    handleUpdateTransaction: (id: string, patch: Partial<Transaction>, before: Transaction) => Promise<void>;
+    handleUpdateTransaction: (id: string, patch: Partial<Transaction>, before: Transaction) => Promise<Transaction>;
     showNotification: (msg: string) => void;
     monthlyBudgetPocket: FinancialPocket | undefined;
     setFilters: React.Dispatch<React.SetStateAction<{ searchTerm: string; dateFrom: string; dateTo: string }>>;

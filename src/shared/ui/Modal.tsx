@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { X } from 'lucide-react';
 
 interface ModalProps {
   isOpen: boolean;
@@ -9,10 +10,6 @@ interface ModalProps {
   footer?: React.ReactNode;
   size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl';
 }
-
-const XIcon = (props: React.SVGProps<SVGSVGElement>) => (
-  <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
-);
 
 const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, children, footer, size = '2xl' }) => {
 
@@ -128,7 +125,7 @@ const Modal: React.FC<ModalProps> = React.memo(({ isOpen, onClose, title, childr
             aria-label="Close modal"
             type="button"
           >
-            <XIcon className="w-5 h-5" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 

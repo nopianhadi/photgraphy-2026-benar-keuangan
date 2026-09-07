@@ -490,6 +490,7 @@ export const Leads: React.FC<LeadsProps> = ({
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [shareModalState, setShareModalState] = useState<{ type: 'package' | 'booking', lead: Lead } | null>(null);
+    const [viewMode, setViewMode] = useState<'kanban' | 'table'>('kanban');
 
     const publicLeadFormUrl = useMemo(() => `${window.location.origin}${window.location.pathname}#/public-lead-form/VEN001`, []);
     const publicBookingFormUrl = useMemo(() => `${window.location.origin}${window.location.pathname}#/public-booking/VEN001`, []);
@@ -786,18 +787,89 @@ export const Leads: React.FC<LeadsProps> = ({
     const modalData = useMemo<{ title: string; items: Lead[]; groupedItems: Record<string, Lead[]> | null }>(() => {
         if (!activeStatModal) return { title: '', items: [], groupedItems: null };
         switch (activeStatModal) {
-            case 'active': return { title: 'Daftar Calon Pengantin Aktif', items: leads.filter(l => l.status === LeadStatus.DISCUSSION || l.status === LeadStatus.FOLLOW_UP), groupedItems: null };
-            case 'new': const now = new Date(); const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); return { title: 'Daftar Calon Pengantin Baru Bulan Ini', items: leads.filter(l => new Date(l.date) >= startOfMonth), groupedItems: null };
-            case 'source': const leadsBySource = leads.reduce((acc, lead) => { const source = lead.contactChannel; if (!acc[source]) acc[source] = []; acc[source].push(lead); return acc; }, {} as Record<string, Lead[]>); return { title: 'Rincian Calon Pengantin Berdasarkan Sumber', items: [], groupedItems: leadsBySource };
-            case 'location': const leadsByLocation = leads.reduce((acc, lead) => { const location = lead.location.trim() || 'Tidak Diketahui'; if (!acc[location]) acc[location] = []; acc[location].push(lead); return acc; }, {} as Record<string, Lead[]>); return { title: 'Rincian Calon Pengantin Berdasarkan Lokasi', items: [], groupedItems: leadsByLocation };
+            case 'all': return { title: `Semua Calon Pengantin (${leads.length})`, items: leads, groupedItems: null };
+            case 'active': return { title: 'Calon Pengantin Aktif (Diskusi + Follow Up)', items: leads.filter(l => l.status === LeadStatus.DISCUSSION || l.status === LeadStatus.FOLLOW_UP), groupedItems: null };
+            case 'discussion': return { title: 'Sedang Diskusi', items: leads.filter(l => l.status === LeadStatus.DISCUSSION), groupedItems: null };
+            case 'followup': return { title: 'Menunggu Follow Up', items: leads.filter(l => l.status === LeadStatus.FOLLOW_UP), groupedItems: null };
+            case 'converted': return { title: 'Dikonversi Menjadi Pengantin', items: leads.filter(l => l.status === LeadStatus.CONVERTED), groupedItems: null };
+            case 'rejected': return { title: 'Ditolak / Tidak Berlanjut', items: leads.filter(l => l.status === LeadStatus.REJECTED), groupedItems: null };
+            case 'new': { const n = new Date(); const som = new Date(n.getFullYear(), n.getMonth(), 1); return { title: 'Calon Pengantin Baru Bulan Ini', items: leads.filter(l => new Date(l.date) >= som), groupedItems: null }; }
+            case 'source': { const leadsBySource = leads.reduce((acc, lead) => { const source = lead.contactChannel; if (!acc[source]) acc[source] = []; acc[source].push(lead); return acc; }, {} as Record<string, Lead[]>); return { title: 'Calon Pengantin Berdasarkan Sumber', items: [], groupedItems: leadsBySource }; }
+            case 'location': { const leadsByLocation = leads.reduce((acc, lead) => { const location = lead.location.trim() || 'Tidak Diketahui'; if (!acc[location]) acc[location] = []; acc[location].push(lead); return acc; }, {} as Record<string, Lead[]>); return { title: 'Calon Pengantin Berdasarkan Lokasi', items: [], groupedItems: leadsByLocation }; }
             default: return { title: '', items: [], groupedItems: null };
         }
     }, [activeStatModal, leads]);
 
+    // ── Stat computations ─────────────────────────────────────────────────────
+    const totalLeads = leads.length;
+    const activeLeads = leads.filter(l => l.status === LeadStatus.DISCUSSION || l.status === LeadStatus.FOLLOW_UP).length;
+    const discussionLeads = leads.filter(l => l.status === LeadStatus.DISCUSSION).length;
+    const followUpLeads = leads.filter(l => l.status === LeadStatus.FOLLOW_UP).length;
+    const convertedLeads = leads.filter(l => l.status === LeadStatus.CONVERTED).length;
+    const rejectedLeads = leads.filter(l => l.status === LeadStatus.REJECTED).length;
+    const conversionRate = totalLeads > 0 ? Math.round((convertedLeads / totalLeads) * 100) : 0;
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const newThisMonth = leads.filter(l => new Date(l.date) >= startOfMonth).length;
+
     const isEmpty = leads.length === 0;
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-5">
+            {/* ── Stat Cards Row ──────────────────────────────────────────────── */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+                <StatCard
+                    icon={<UsersIcon className="w-5 h-5" />}
+                    title="Total Prospek"
+                    value={String(totalLeads)}
+                    subtitle={`+${newThisMonth} bulan ini`}
+                    colorVariant="blue"
+                    onClick={() => handleStatCardClick('all')}
+                />
+                <StatCard
+                    icon={<TargetIcon className="w-5 h-5" />}
+                    title="Aktif"
+                    value={String(activeLeads)}
+                    subtitle="Diskusi + Follow Up"
+                    colorVariant="purple"
+                    onClick={() => handleStatCardClick('active')}
+                />
+                <StatCard
+                    icon={<MessageSquareIcon className="w-5 h-5" />}
+                    title="Sedang Diskusi"
+                    value={String(discussionLeads)}
+                    subtitle="Perlu tindakan"
+                    colorVariant="orange"
+                    onClick={() => handleStatCardClick('discussion')}
+                />
+                <StatCard
+                    icon={<ChevronRightIcon className="w-5 h-5" />}
+                    title="Follow Up"
+                    value={String(followUpLeads)}
+                    subtitle="Menunggu respons"
+                    colorVariant="pink"
+                    onClick={() => handleStatCardClick('followup')}
+                />
+                <StatCard
+                    icon={<CheckCircleIcon className="w-5 h-5" />}
+                    title="Dikonversi"
+                    value={String(convertedLeads)}
+                    subtitle={`${conversionRate}% konversi`}
+                    colorVariant="green"
+                    changeType="increase"
+                    change={`${conversionRate}%`}
+                    onClick={() => handleStatCardClick('converted')}
+                />
+                <StatCard
+                    icon={<Share2Icon className="w-5 h-5" />}
+                    title="Ditolak"
+                    value={String(rejectedLeads)}
+                    subtitle="Tidak berlanjut"
+                    colorVariant="red"
+                    onClick={() => handleStatCardClick('rejected')}
+                />
+            </div>
+
             {isEmpty ? (
                 <div className="text-center py-20">
                     <LightbulbIcon className="mx-auto h-16 w-16 text-brand-accent" />
@@ -807,6 +879,7 @@ export const Leads: React.FC<LeadsProps> = ({
                 </div>
             ) : (
                 <>
+                    {/* ── Filter Bar ──────────────────────────────────────────────── */}
                     <div className="bg-brand-surface p-3 md:p-4 rounded-xl shadow-lg border border-brand-border flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3 md:gap-4 leads-filter-section">
                         <div className="input-group flex-grow !mt-0 w-full lg:w-auto">
                             <input type="search" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} className="input-field !rounded-lg !border !bg-brand-bg p-2 md:p-2.5 text-sm" placeholder=" " />
@@ -822,10 +895,31 @@ export const Leads: React.FC<LeadsProps> = ({
                                 {Object.values(ContactChannel).map(s => <option key={s} value={s}>{s}</option>)}
                             </select>
                             <div className="flex items-center justify-end gap-2 w-full sm:w-auto leads-filter-buttons">
-                                <button onClick={toggleHiddenColumns} className="button-secondary min-h-[40px] px-3 py-2 inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-none text-xs sm:text-sm font-semibold" title={hiddenColumns.has(LeadStatus.CONVERTED) ? 'Tampilkan Kolom Selesai' : 'Sembunyikan Kolom Selesai'}>
-                                    <EyeIcon className="w-4 h-4 flex-shrink-0" />
-                                    <span className="inline sm:hidden lg:inline">{hiddenColumns.has(LeadStatus.CONVERTED) ? 'Tampil' : 'Kolom'}</span>
-                                </button>
+                                {/* View toggle */}
+                                <div className="flex rounded-lg border border-brand-border overflow-hidden flex-shrink-0">
+                                    <button
+                                        onClick={() => setViewMode('kanban')}
+                                        className={`px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1 ${viewMode === 'kanban' ? 'bg-brand-accent text-white' : 'bg-brand-bg text-brand-text-secondary hover:bg-brand-border'}`}
+                                        title="Tampilan Kanban"
+                                    >
+                                        <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 16 16"><rect x="1" y="1" width="4" height="14" rx="1"/><rect x="6" y="1" width="4" height="10" rx="1"/><rect x="11" y="1" width="4" height="12" rx="1"/></svg>
+                                        <span className="hidden sm:inline">Kanban</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setViewMode('table')}
+                                        className={`px-3 py-2 text-xs font-semibold transition-colors flex items-center gap-1 ${viewMode === 'table' ? 'bg-brand-accent text-white' : 'bg-brand-bg text-brand-text-secondary hover:bg-brand-border'}`}
+                                        title="Tampilan Tabel"
+                                    >
+                                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 16 16"><rect x="1" y="1" width="14" height="14" rx="1"/><line x1="1" y1="5" x2="15" y2="5"/><line x1="1" y1="9" x2="15" y2="9"/><line x1="1" y1="13" x2="15" y2="13"/><line x1="5" y1="1" x2="5" y2="15"/></svg>
+                                        <span className="hidden sm:inline">Tabel</span>
+                                    </button>
+                                </div>
+                                {viewMode === 'kanban' && (
+                                    <button onClick={toggleHiddenColumns} className="button-secondary min-h-[40px] px-3 py-2 inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-none text-xs sm:text-sm font-semibold" title={hiddenColumns.has(LeadStatus.CONVERTED) ? 'Tampilkan Kolom Selesai' : 'Sembunyikan Kolom Selesai'}>
+                                        <EyeIcon className="w-4 h-4 flex-shrink-0" />
+                                        <span className="inline sm:hidden lg:inline">{hiddenColumns.has(LeadStatus.CONVERTED) ? 'Tampil' : 'Kolom'}</span>
+                                    </button>
+                                )}
                                 <button onClick={() => setIsShareModalOpen(true)} className="button-secondary min-h-[40px] px-3 py-2 inline-flex items-center justify-center gap-1.5 flex-1 sm:flex-none text-xs sm:text-sm font-semibold" title="Bagikan Form Calon Pengantin">
                                     <Share2Icon className="w-4 h-4 flex-shrink-0" />
                                     <span className="inline sm:hidden">Share</span>
@@ -837,66 +931,250 @@ export const Leads: React.FC<LeadsProps> = ({
                             </div>
                         </div>
                     </div>
-                    {/* Mobile grouped list */}
-                    <div className="md:hidden space-y-3 -mx-4 px-4">
-                        {visibleLeadColumns.map(([status, leadItems]) => {
-                            const statusInfo = statusConfig[status as LeadStatus];
-                            return (
-                                <div key={status} className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
-                                    <div className="p-3 text-sm md:text-base font-semibold text-brand-text-light border-b flex justify-between items-center" style={{ borderColor: statusInfo.color, borderBottomWidth: 2 }}>
-                                        <span className="truncate">{statusInfo.title}</span>
-                                    </div>
-                                    <div className="p-2 space-y-2">
-                                        {leadItems.map(lead => (
-                                            <LeadCard
-                                                key={lead.id}
-                                                lead={lead}
-                                                onDragStart={() => { }}
-                                                onClick={() => handleOpenModal('edit', lead)}
-                                                onEdit={() => handleOpenModal('edit', lead)}
-                                                onDelete={() => {
-                                                    const ok = window.confirm(`Hapus Calon Pengantin "${lead.name}"?`);
-                                                    if (!ok) return;
-                                                    setLeads(prev => prev.filter(l => l.id !== lead.id));
-                                                    void deleteLeadRow(lead.id).catch(err => {
-                                                        console.warn('[Supabase] delete lead failed', err);
-                                                        showNotification('Gagal menghapus Calon Pengantin. Silakan coba lagi.');
-                                                    });
-                                                }}
-                                                onNextStatus={() => handleNextStatus(lead.id, lead.status)}
-                                                onShare={(type) => setShareModalState({ type, lead })}
-                                            />
-                                        ))}
-                                        {leadItems.length === 0 && (
-                                            <p className="text-center py-6 text-xs md:text-sm text-brand-text-secondary">Tidak ada Calon Pengantin.</p>
-                                        )}
-                                    </div>
+
+                    {/* ── Kanban View ─────────────────────────────────────────────── */}
+                    {viewMode === 'kanban' && (
+                        <>
+                            {/* Mobile grouped list */}
+                            <div className="md:hidden space-y-3 -mx-4 px-4">
+                                {visibleLeadColumns.map(([status, leadItems]) => {
+                                    const statusInfo = statusConfig[status as LeadStatus];
+                                    return (
+                                        <div key={status} className="bg-brand-bg rounded-2xl border border-brand-border overflow-hidden">
+                                            <div className="p-3 text-sm font-semibold text-brand-text-light border-b flex justify-between items-center" style={{ borderColor: statusInfo.color, borderBottomWidth: 2 }}>
+                                                <span className="truncate">{statusInfo.title}</span>
+                                                <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white ml-2 flex-shrink-0" style={{ backgroundColor: statusInfo.color }}>{leadItems.length}</span>
+                                            </div>
+                                            <div className="p-2 space-y-2">
+                                                {leadItems.map(lead => (
+                                                    <LeadCard
+                                                        key={lead.id}
+                                                        lead={lead}
+                                                        onDragStart={() => { }}
+                                                        onClick={() => handleOpenModal('edit', lead)}
+                                                        onEdit={() => handleOpenModal('edit', lead)}
+                                                        onDelete={() => {
+                                                            const ok = window.confirm(`Hapus Calon Pengantin "${lead.name}"?`);
+                                                            if (!ok) return;
+                                                            setLeads(prev => prev.filter(l => l.id !== lead.id));
+                                                            void deleteLeadRow(lead.id).catch(err => {
+                                                                console.warn('[Supabase] delete lead failed', err);
+                                                                showNotification('Gagal menghapus Calon Pengantin. Silakan coba lagi.');
+                                                            });
+                                                        }}
+                                                        onNextStatus={() => handleNextStatus(lead.id, lead.status)}
+                                                        onShare={(type) => setShareModalState({ type, lead })}
+                                                    />
+                                                ))}
+                                                {leadItems.length === 0 && (
+                                                    <p className="text-center py-6 text-xs text-brand-text-secondary">Tidak ada Calon Pengantin.</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            {/* Desktop kanban columns */}
+                            <div className="hidden md:flex gap-4 overflow-x-auto pb-4 -mx-4 px-4">
+                                {visibleLeadColumns.map(([status, leadItems]) => {
+                                    const statusInfo = statusConfig[status as LeadStatus];
+                                    return (
+                                        <div key={status} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, status as LeadStatus)} className="w-80 flex-shrink-0 bg-brand-bg rounded-2xl border border-brand-border flex flex-col leads-column-container">
+                                            <div className="p-4 font-semibold text-brand-text-light border-b-2 flex justify-between items-center sticky top-0 bg-brand-bg/80 backdrop-blur-sm rounded-t-2xl z-10 leads-column-header" style={{ borderColor: statusInfo.color }}>
+                                                <span>{statusInfo.title}</span>
+                                                <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: statusInfo.color }}>{leadItems.length}</span>
+                                            </div>
+                                            <div className="p-3 space-y-3 h-auto pr-1">
+                                                {leadItems.map(lead => (
+                                                    <LeadCard key={lead.id} lead={lead} onDragStart={handleDragStart} onClick={() => handleOpenModal('edit', lead)} onEdit={() => handleOpenModal('edit', lead)} onDelete={() => {
+                                                        const ok = window.confirm(`Hapus Calon Pengantin "${lead.name}"?`);
+                                                        if (!ok) return;
+                                                        setLeads(prev => prev.filter(l => l.id !== lead.id));
+                                                        void deleteLeadRow(lead.id).catch(err => {
+                                                            console.warn('[Supabase] delete lead failed', err);
+                                                            showNotification('Gagal menghapus Calon Pengantin. Silakan coba lagi.');
+                                                        });
+                                                    }} onNextStatus={() => handleNextStatus(lead.id, lead.status)} onShare={(type) => setShareModalState({ type, lead })} />
+                                                ))}
+                                                {leadItems.length === 0 && <p className="text-center py-8 text-sm text-brand-text-secondary">Tidak ada Calon Pengantin.</p>}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </>
+                    )}
+
+                    {/* ── Table View ──────────────────────────────────────────────── */}
+                    {viewMode === 'table' && (
+                        <div className="bg-brand-surface rounded-2xl border border-brand-border shadow-lg overflow-hidden">
+                            {/* Table summary bar */}
+                            <div className="px-4 py-3 border-b border-brand-border flex items-center justify-between gap-2 flex-wrap">
+                                <p className="text-sm font-semibold text-brand-text-light">
+                                    {filteredLeads.length} Calon Pengantin
+                                    {filteredLeads.length !== leads.length && <span className="text-brand-text-secondary font-normal"> dari {leads.length} total</span>}
+                                </p>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                    {Object.values(LeadStatus).map(s => {
+                                        const sc = statusConfig[s];
+                                        if (!sc) return null;
+                                        const count = filteredLeads.filter(l => l.status === s).length;
+                                        return count > 0 ? (
+                                            <span key={s} className="text-[10px] font-bold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: sc.color }}>
+                                                {sc.title}: {count}
+                                            </span>
+                                        ) : null;
+                                    })}
                                 </div>
-                            );
-                        })}
-                    </div>
-                    {/* Desktop kanban columns */}
-                    <div className="hidden md:flex gap-4 overflow-x-auto pb-4 -mx-4 px-4">
-                        {visibleLeadColumns.map(([status, leadItems]) => {
-                            const statusInfo = statusConfig[status as LeadStatus];
-                            return (
-                                <div key={status} onDragOver={handleDragOver} onDrop={(e) => handleDrop(e, status as LeadStatus)} className="w-80 flex-shrink-0 bg-brand-bg rounded-2xl border border-brand-border flex flex-col leads-column-container">
-                                    <div className="p-4 font-semibold text-brand-text-light border-b-2 flex justify-between items-center sticky top-0 bg-brand-bg/80 backdrop-blur-sm rounded-t-2xl z-10 leads-column-header" style={{ borderColor: statusInfo.color }}>
-                                        <span>{statusInfo.title}</span>
-                                    </div>
-                                    <div className="p-3 space-y-3 h-auto pr-1">{leadItems.map(lead => <LeadCard key={lead.id} lead={lead} onDragStart={handleDragStart} onClick={() => handleOpenModal('edit', lead)} onEdit={() => handleOpenModal('edit', lead)} onDelete={() => {
-                                        const ok = window.confirm(`Hapus Calon Pengantin "${lead.name}"?`);
-                                        if (!ok) return;
-                                        setLeads(prev => prev.filter(l => l.id !== lead.id));
-                                        void deleteLeadRow(lead.id).catch(err => {
-                                            console.warn('[Supabase] delete lead failed', err);
-                                            showNotification('Gagal menghapus Calon Pengantin. Silakan coba lagi.');
-                                        });
-                                    }} onNextStatus={() => handleNextStatus(lead.id, lead.status)} onShare={(type) => setShareModalState({ type, lead })} />)}</div>
+                            </div>
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-sm !border-0">
+                                    <thead>
+                                        <tr className="bg-brand-bg text-left">
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border w-10">#</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border">Nama</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden sm:table-cell">WA / Kontak</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden md:table-cell">Lokasi</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden lg:table-cell">Sumber</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden lg:table-cell">Tgl Kontak</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border hidden xl:table-cell">Tgl Acara</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border">Status</th>
+                                            <th className="px-4 py-3 text-xs font-bold text-brand-text-secondary uppercase tracking-wider !border-0 border-b border-brand-border text-right">Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {filteredLeads.length === 0 ? (
+                                            <tr>
+                                                <td colSpan={9} className="px-4 py-12 text-center text-brand-text-secondary !border-0">
+                                                    <LightbulbIcon className="mx-auto w-8 h-8 mb-2 opacity-40" />
+                                                    <p>Tidak ada Calon Pengantin yang cocok dengan filter.</p>
+                                                </td>
+                                            </tr>
+                                        ) : filteredLeads.map((lead, idx) => {
+                                            const sc = statusConfig[lead.status] ?? { color: '#64748b', title: lead.status };
+                                            const isHot = new Date(lead.date) > new Date(Date.now() - 24 * 60 * 60 * 1000);
+                                            return (
+                                                <tr
+                                                    key={lead.id}
+                                                    className="border-t border-brand-border/50 hover:bg-brand-bg/60 transition-colors cursor-pointer group"
+                                                    onClick={() => handleOpenModal('edit', lead)}
+                                                >
+                                                    {/* # */}
+                                                    <td className="px-4 py-3 text-brand-text-secondary text-xs !border-0">{idx + 1}</td>
+                                                    {/* Nama */}
+                                                    <td className="px-4 py-3 !border-0">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0" style={{ backgroundColor: sc.color }}>
+                                                                {lead.name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase()}
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <p className="font-semibold text-brand-text-light text-sm truncate max-w-[160px]">
+                                                                    {lead.name}
+                                                                    {isHot && <span className="ml-1" title="Baru 24 jam">🔥</span>}
+                                                                </p>
+                                                                {lead.notes && <p className="text-xs text-brand-text-secondary truncate max-w-[160px]">{lead.notes}</p>}
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    {/* WA */}
+                                                    <td className="px-4 py-3 hidden sm:table-cell !border-0">
+                                                        {lead.whatsapp ? (
+                                                            <a
+                                                                href={`https://wa.me/${cleanPhoneNumber(lead.whatsapp)}`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                onClick={e => e.stopPropagation()}
+                                                                className="btn-box-wa px-2 py-1 text-xs inline-flex items-center gap-1"
+                                                            >
+                                                                <WhatsappIcon className="w-3 h-3" />
+                                                                {lead.whatsapp}
+                                                            </a>
+                                                        ) : (
+                                                            <span className="text-brand-text-secondary text-xs">—</span>
+                                                        )}
+                                                    </td>
+                                                    {/* Lokasi */}
+                                                    <td className="px-4 py-3 hidden md:table-cell !border-0">
+                                                        {lead.location ? (
+                                                            <span className="flex items-center gap-1 text-xs text-brand-text-primary">
+                                                                <MapPinIcon className="w-3 h-3 text-brand-accent flex-shrink-0" />
+                                                                {lead.location}
+                                                            </span>
+                                                        ) : <span className="text-brand-text-secondary text-xs">—</span>}
+                                                    </td>
+                                                    {/* Sumber */}
+                                                    <td className="px-4 py-3 hidden lg:table-cell !border-0">
+                                                        <span className="flex items-center gap-1.5 text-xs text-brand-text-primary">
+                                                            <span style={{ color: sourceColors[lead.contactChannel] }}>
+                                                                {getContactChannelIcon(lead.contactChannel)}
+                                                            </span>
+                                                            {lead.contactChannel}
+                                                        </span>
+                                                    </td>
+                                                    {/* Tgl Kontak */}
+                                                    <td className="px-4 py-3 hidden lg:table-cell !border-0">
+                                                        <span className="text-xs text-brand-text-primary">{new Date(lead.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                                                    </td>
+                                                    {/* Tgl Acara */}
+                                                    <td className="px-4 py-3 hidden xl:table-cell !border-0">
+                                                        {lead.eventDate ? (
+                                                            <span className="flex items-center gap-1 text-xs text-brand-text-primary">
+                                                                <CalendarIcon className="w-3 h-3 text-brand-accent flex-shrink-0" />
+                                                                {new Date(lead.eventDate).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                                                            </span>
+                                                        ) : <span className="text-brand-text-secondary text-xs">—</span>}
+                                                    </td>
+                                                    {/* Status */}
+                                                    <td className="px-4 py-3 !border-0">
+                                                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold text-white whitespace-nowrap" style={{ backgroundColor: sc.color }}>
+                                                            {sc.title}
+                                                        </span>
+                                                    </td>
+                                                    {/* Aksi */}
+                                                    <td className="px-4 py-3 !border-0" onClick={e => e.stopPropagation()}>
+                                                        <div className="flex items-center justify-end gap-1.5">
+                                                            {lead.status === LeadStatus.DISCUSSION && (
+                                                                <>
+                                                                    <button onClick={() => setShareModalState({ type: 'package', lead })} className="btn-box-wa px-2 py-1 text-[10px] hidden sm:inline-flex items-center gap-1" title="Kirim Package WA">
+                                                                        <WhatsappIcon className="w-3 h-3" /><span>Pkg</span>
+                                                                    </button>
+                                                                    <button onClick={() => handleNextStatus(lead.id, lead.status)} className="btn-box-read px-2 py-1 text-[10px] hidden sm:inline-flex items-center gap-1" title="Pindah ke Follow Up">
+                                                                        FU <ChevronRightIcon className="w-3 h-3" />
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {lead.status === LeadStatus.FOLLOW_UP && (
+                                                                <>
+                                                                    <button onClick={() => setShareModalState({ type: 'booking', lead })} className="btn-box-wa px-2 py-1 text-[10px] hidden sm:inline-flex items-center gap-1" title="Kirim Form Booking WA">
+                                                                        <WhatsappIcon className="w-3 h-3" /><span>Booking</span>
+                                                                    </button>
+                                                                    <button onClick={() => handleOpenModal('convert', lead)} className="btn-box-add px-2 py-1 text-[10px] hidden sm:inline-flex items-center gap-1" title="Konversi">
+                                                                        <CheckCircleIcon className="w-3 h-3" /><span>Konversi</span>
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            <button onClick={() => handleOpenModal('edit', lead)} className="btn-box-edit w-7 h-7 rounded-md" title="Edit">
+                                                                <PencilIcon className="w-3.5 h-3.5" />
+                                                            </button>
+                                                            <button onClick={() => handleDeleteLead(lead.id)} className="btn-box-delete w-7 h-7 rounded-md" title="Hapus">
+                                                                <Trash2Icon className="w-3.5 h-3.5 text-white" />
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {/* Table footer */}
+                            {filteredLeads.length > 0 && (
+                                <div className="px-4 py-3 border-t border-brand-border bg-brand-bg/50 text-xs text-brand-text-secondary text-right">
+                                    Menampilkan {filteredLeads.length} dari {leads.length} calon pengantin
                                 </div>
-                            );
-                        })}
-                    </div>
+                            )}
+                        </div>
+                    )}
                 </>
             )}
 
